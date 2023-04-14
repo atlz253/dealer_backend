@@ -1,4 +1,5 @@
 import express, { Express, Request, Response } from "express";
+import IBaseContract from "./node_modules/audio_diler_common/interfaces/IBaseContract";
 import IContract from "./node_modules/audio_diler_common/interfaces/IContract";
 import cors from "cors";
 
@@ -12,7 +13,7 @@ app.get('/', (req: Request, res: Response) => {
 });
 
 app.get('/contracts', (req: Request, res: Response) => {
-  const mockup: IContract[] = [
+  const mockup: IBaseContract[] = [
     {
       id: 0,
       seller: "Столяров Д.Д.",
@@ -42,6 +43,43 @@ app.get('/contracts', (req: Request, res: Response) => {
       date: Date.now()
     },
   ];
+
+  res.send(mockup);
+});
+
+app.get('/contracts/:contractID', (req: Request, res: Response) => {
+  const mockup: IContract =
+  {
+    id: Number(req.params.contractID),
+    seller: "Столяров Д.Д.",
+    buyer: "Мигас А.С.",
+    price: 999,
+    date: Date.now(),
+    sellerBill: {
+      ownerName: "Дмитрий Дмитриевич Столяров",
+      billNumber: 12345678901234567890,
+      bankName: "ОАО «Альфа-банк»",
+      correspondentBill: 12345,
+      BIC: 1111,
+      INN: 2222
+    },
+    buyerBill: {
+      ownerName: "Мигас Александр Сергеевич",
+      billNumber: 12345678901234567890,
+      bankName: "ОАО «Альфа-банк»",
+      correspondentBill: 0,
+      BIC: 0,
+      INN: 0
+    },
+    products: [
+      {
+        id: 0,
+        name: "Lorem ipsum",
+        quantity: 10,
+        price: 999
+      }
+    ]
+  };
 
   res.send(mockup);
 });
