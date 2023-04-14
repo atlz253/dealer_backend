@@ -1,8 +1,11 @@
 import express, { Express, Request, Response } from "express";
 import IContract from "./node_modules/audio_diler_common/interfaces/IContract";
+import cors from "cors";
 
 const app: Express = express();
 const port = 2727
+
+app.use(cors());
 
 app.get('/', (req: Request, res: Response) => {
   res.send("Hello world");
