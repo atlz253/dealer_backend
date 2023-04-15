@@ -49,19 +49,19 @@ contractsRouter.get('/:contractID', (req: Request, res: Response) => {
         date: Date.now(),
         sellerBill: {
             ownerName: "Дмитрий Дмитриевич Столяров",
-            billNumber: 12345678901234567890,
+            billNumber: "12345678901234567890",
             bankName: "ОАО «Альфа-банк»",
-            correspondentBill: 12345,
-            BIC: 1111,
-            INN: 2222
+            correspondentBill: "12345",
+            BIC: "1111",
+            INN: "2222"
         },
         buyerBill: {
             ownerName: "Мигас Александр Сергеевич",
-            billNumber: 12345678901234567890,
+            billNumber: "12345678901234567890",
             bankName: "ОАО «Альфа-банк»",
-            correspondentBill: 0,
-            BIC: 0,
-            INN: 0
+            correspondentBill: "0",
+            BIC: "0",
+            INN: "0"
         },
         products: [
             {
