@@ -67,6 +67,7 @@ contractsRouter.get('/:contractID', (req: Request, res: Response) => {
             {
                 id: 0,
                 name: "Lorem ipsum",
+                category: "aboba",
                 quantity: 10,
                 price: 999
             }
