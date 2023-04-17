@@ -1,8 +1,14 @@
 import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
 import IProduct from "audio_diler_common/interfaces/IProduct";
 import express, { Request, Response } from "express";
+import dilerAuthCheck from "./dilerAuthCheck";
+import jwtCheck from "./jwtCheck";
+import IResponse from "audio_diler_common/interfaces/IResponse";
 
 const productsRouter = express.Router();
+
+productsRouter.use(jwtCheck);
+productsRouter.use(dilerAuthCheck);
 
 productsRouter.get('/', (req: Request, res: Response) => {
     const mockup: IBaseProduct[] = [
@@ -43,7 +49,12 @@ productsRouter.get('/', (req: Request, res: Response) => {
         },
     ];
 
-    res.send(mockup);
+    const request: IResponse<IBaseProduct[]> = {
+        status: 200,
+        data: mockup
+    }
+
+    res.send(request);
 });
 
 productsRouter.get('/:productID', (req: Request, res: Response) => {
@@ -56,7 +67,12 @@ productsRouter.get('/:productID', (req: Request, res: Response) => {
         description: "src/products.ts(45,11): error TS2741: Property 'description' is missing in type '{ id: number; name: string; quantity: number; price: number; }' but required in type 'IProduct'."
     };
 
-    res.send(mockup);
+    const request: IResponse<IProduct> = {
+        status: 200,
+        data: mockup
+    }
+
+    res.send(request);
 });
 
 export default productsRouter;

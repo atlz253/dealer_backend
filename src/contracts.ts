@@ -1,8 +1,14 @@
 import express, { Request, Response } from "express";
 import IBaseContract from "audio_diler_common/interfaces/IBaseContract";
 import IContract from "audio_diler_common/interfaces/IContract";
+import dilerAuthCheck from "./dilerAuthCheck";
+import jwtCheck from "./jwtCheck";
+import IResponse from "audio_diler_common/interfaces/IResponse";
 
 const contractsRouter = express.Router();
+
+contractsRouter.use(jwtCheck);
+contractsRouter.use(dilerAuthCheck);
 
 contractsRouter.get('/', (req: Request, res: Response) => {
     const mockup: IBaseContract[] = [
@@ -36,7 +42,12 @@ contractsRouter.get('/', (req: Request, res: Response) => {
         },
     ];
 
-    res.send(mockup);
+    const response: IResponse<IBaseContract[]> = {
+        status: 200,
+        data: mockup
+    }
+
+    res.json(response);
 });
 
 contractsRouter.get('/:contractID', (req: Request, res: Response) => {
@@ -74,7 +85,12 @@ contractsRouter.get('/:contractID', (req: Request, res: Response) => {
         ]
     };
 
-    res.send(mockup);
+    const response: IResponse<IContract> = {
+        status: 200,
+        data: mockup
+    }
+
+    res.json(response);
 });
 
 export default contractsRouter;
