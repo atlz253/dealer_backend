@@ -5,6 +5,7 @@ import productsRouter from "./products";
 import bodyParser from "body-parser";
 import { port } from "./config";
 import loginRouter from "./login";
+import pool from "./db";
 
 const app: Express = express();
 
@@ -16,7 +17,15 @@ app.use("/products", productsRouter)
 app.use("/login", loginRouter);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send("Hello world");
+  pool.query('SELECT * FROM "Bills"', (error, result) => {
+    if (error) {
+      res.send(error.message);
+
+      return;
+    }
+
+    res.send(result.rows);
+  });
 });
 
 app.listen(port, () => {

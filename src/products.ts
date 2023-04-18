@@ -1,9 +1,11 @@
 import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
 import IProduct from "audio_diler_common/interfaces/IProduct";
-import express, { Request, Response } from "express";
+import express, { Request, Response, response } from "express";
 import dilerAuthCheck from "./dilerAuthCheck";
 import jwtCheck from "./jwtCheck";
 import IResponse from "audio_diler_common/interfaces/IResponse";
+import pool from "./db";
+import { error } from "console";
 
 const productsRouter = express.Router();
 
@@ -11,68 +13,86 @@ productsRouter.use(jwtCheck);
 productsRouter.use(dilerAuthCheck);
 
 productsRouter.get('/', (req: Request, res: Response) => {
-    const mockup: IBaseProduct[] = [
-        {
-            id: 0,
-            name: "Lorem ipsum",
-            category: "aboba",
-            quantity: 10,
-            price: 999
-        },
-        {
-            id: 1,
-            name: "Lorem ipsum",
-            category: "aboba",
-            quantity: 10,
-            price: 999
-        },
-        {
-            id: 2,
-            name: "Lorem ipsum",
-            category: "aboba",
-            quantity: 10,
-            price: 999
-        },
-        {
-            id: 3,
-            name: "Lorem ipsum",
-            category: "aboba",
-            quantity: 10,
-            price: 999
-        },
-        {
-            id: 4,
-            name: "Lorem ipsum",
-            category: "aboba",
-            quantity: 10,
-            price: 999
-        },
-    ];
+    pool.query('SELECT "productID" as "id", "name", "category", "price", "quantity", "description" FROM "Products"', (error, response) => {
+        if (error) {
+            const response: IResponse = {
+                status: 400
+            }
 
-    const request: IResponse<IBaseProduct[]> = {
-        status: 200,
-        data: mockup
-    }
+            return res.json(response);
+        }
 
-    res.send(request);
+        // TODO: описать возвращаемый тип
+
+        return res.json({
+            status: 200,
+            data: response.rows
+        });
+    });
 });
 
 productsRouter.get('/:productID', (req: Request, res: Response) => {
-    const mockup: IProduct = {
-        id: Number(req.params.productID),
-        name: "Lorem ipsum",
-        category: "aboba",
-        quantity: 10,
-        price: 999,
-        description: "src/products.ts(45,11): error TS2741: Property 'description' is missing in type '{ id: number; name: string; quantity: number; price: number; }' but required in type 'IProduct'."
-    };
+    pool.query(`SELECT "productID" as "id", "name", "category", "price", "quantity", "description" FROM "Products" WHERE "productID" = ${req.params.productID}`, (error, result) => {
+        if (error) {
+            console.error(error);
 
-    const request: IResponse<IProduct> = {
-        status: 200,
-        data: mockup
-    }
+            const response: IResponse = {
+                status: 400
+            }
 
-    res.send(request);
+            return res.json(response);
+        }
+
+        // TODO: проверка на наличие записи
+
+        return res.json({
+            status: 200,
+            data: result.rows[0]
+        });
+    });
+});
+
+productsRouter.post("/new", (req: Request, res: Response) => {
+    pool.query(`INSERT INTO "Products" ("name", "category", "price", "quantity", "description") VALUES ('${req.body.name}', '${req.body.category}', '${req.body.price}', '${req.body.quantity}', '${req.body.description}') RETURNING "productID" as "id"`, (error, result) => {
+        if (error) {
+            console.error(error);
+
+            const response: IResponse = {
+                status: 400
+            }
+
+            return res.json(response);
+        }
+
+        req.body.id = result.rows[0].id;
+
+        return res.json(
+            {
+                status: 200,
+                data: req.body
+            }
+        );
+    });
+});
+
+productsRouter.put("/new", (req: Request, res: Response) => {
+    pool.query(`UPDATE "Products" SET "name" = '${req.body.name}', "category" = '${req.body.category}', "price" = '${req.body.price}', "quantity" = '${req.body.quantity}', "description" = '${req.body.description}' WHERE "productID" = '${req.body.id}'`, (error, result) => {
+        if (error) {
+            console.error(error);
+
+            const response: IResponse = {
+                status: 400
+            }
+
+            return res.json(response);
+        }
+
+        const response: IResponse = {
+            status: 200
+        }
+
+        return res.json(response);
+    });
 });
 
 export default productsRouter;
