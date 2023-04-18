@@ -5,7 +5,7 @@ import productsRouter from "./products";
 import bodyParser from "body-parser";
 import { port } from "./config";
 import loginRouter from "./login";
-import pool from "./db";
+import pool from "./DB/pool";
 
 const app: Express = express();
 
