@@ -7,10 +7,18 @@ import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
 import IResponse from "audio_diler_common/interfaces/IResponse";
 
 class Products {
+    private static ConvertMoneyToNumber(money: any): number {
+        return Number(money.toString().replace(" ?", "").replace(",", "."));
+    }
+
+    private static ConvertNumberToMoney(number: number): string {
+        return number.toString().replace(".", ",");
+    }
+
     public static async Insert(product: IProduct): Promise<number> {
         const categoryID = await DB.Categories.GetIDByName(product.category);
-
         const manufacturerID = await DB.Manufacturers.GetIDByName(product.manufacturer);
+        const price = this.ConvertNumberToMoney(product.price);
 
         const query: QueryConfig = {
             text: `
@@ -28,7 +36,7 @@ class Products {
                 RETURNING 
                     product_id as id
             `,
-            values: [product.name, product.price, product.quantity, product.description, categoryID, manufacturerID]
+            values: [product.name, price, product.quantity, product.description, categoryID, manufacturerID]
         }
 
         const result = await pool.query<ID>(query);
@@ -54,6 +62,12 @@ class Products {
         }
 
         const result = await pool.query<IBaseProduct>(query);
+
+        for (let i = 0; i < result.rowCount; i++) {
+            const row = result.rows[i];
+            
+            row.price = this.ConvertMoneyToNumber(row.price);
+        }
 
         return result.rows;
     }
@@ -85,12 +99,19 @@ class Products {
 
         const result = await pool.query<IProduct>(query);
 
+        for (let i = 0; i < result.rowCount; i++) {
+            const row = result.rows[i];
+            
+            row.price = this.ConvertMoneyToNumber(row.price);
+        }
+
         return result.rows[0];
     }
 
     public static async Update(product: IProduct): Promise<IResponse> {
         const categoryID = await DB.Categories.GetIDByName(product.category);
         const manufacturerID = await DB.Manufacturers.GetIDByName(product.manufacturer);
+        const price = this.ConvertNumberToMoney(product.price);
 
         const query: QueryConfig = {
             text: `
@@ -108,7 +129,7 @@ class Products {
             `,
             values: [
                 product.name, 
-                product.price, 
+                price, 
                 product.quantity, 
                 product.description, 
                 categoryID, 
