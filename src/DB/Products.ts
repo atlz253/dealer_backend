@@ -15,7 +15,7 @@ class Products {
         return number.toString().replace(".", ",");
     }
 
-    public static async Insert(product: IProduct): Promise<number> {
+    public static async Insert(product: IProduct): Promise<ID> {
         const categoryID = await DB.Categories.GetIDByName(product.category);
         const manufacturerID = await DB.Manufacturers.GetIDByName(product.manufacturer);
         const price = this.ConvertNumberToMoney(product.price);
@@ -41,7 +41,7 @@ class Products {
 
         const result = await pool.query<ID>(query);
 
-        return result.rows[0].id;
+        return result.rows[0];
     }
 
     public static async SelectAll(): Promise<IBaseProduct[]> {
@@ -108,7 +108,7 @@ class Products {
         return result.rows[0];
     }
 
-    public static async Update(product: IProduct): Promise<IResponse> {
+    public static async Update(product: IProduct): Promise<void> {
         const categoryID = await DB.Categories.GetIDByName(product.category);
         const manufacturerID = await DB.Manufacturers.GetIDByName(product.manufacturer);
         const price = this.ConvertNumberToMoney(product.price);
@@ -139,10 +139,6 @@ class Products {
         }
 
         pool.query(query);
-
-        return {
-            status: 200
-        }
     }
 
     public static async Delete(id: number): Promise<void> {

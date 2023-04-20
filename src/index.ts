@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import { port } from "./config";
 import loginRouter from "./login";
 import pool from "./DB/pool";
+import errorHandler from "./errorHandler";
 
 const app: Express = express();
 
@@ -27,6 +28,8 @@ app.get('/', (req: Request, res: Response) => {
     res.send(result.rows);
   });
 });
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`App listening on port ${port}`)
