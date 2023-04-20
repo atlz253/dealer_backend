@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import IBaseContract from "audio_diler_common/interfaces/IBaseContract";
 import IContract from "audio_diler_common/interfaces/IContract";
-import dilerAuthCheck from "./dilerAuthCheck";
+import dilerAuthCheck from "./dealerAuthCheck";
 import jwtCheck from "./jwtCheck";
 import IResponse from "audio_diler_common/interfaces/IResponse";
 

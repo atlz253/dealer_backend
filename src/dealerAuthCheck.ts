@@ -7,7 +7,7 @@ const dilerAuthCheck = (req: AuthRequest, res: Response, next: NextFunction) => 
         return res.sendStatus(401);
     }
 
-    if (req.user.role !== "admin") {
+    if (req.user.role !== "dealer") {
         return res.sendStatus(401);
     }
 

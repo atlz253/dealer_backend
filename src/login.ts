@@ -16,7 +16,7 @@ export const usersMockup: IUser[] = [
     {
         login: "user",
         password: "user",
-        role: "diler"
+        role: "dealer"
     }
 ]
 
