@@ -4,19 +4,11 @@ import IResponse from "audio_diler_common/interfaces/IResponse";
 
 const dilerAuthCheck = (req: AuthRequest, res: Response, next: NextFunction) => {
     if (req.user === undefined) {
-        const status: IResponse = {
-            status: 401
-        }
-
-        return res.json(status);
+        return res.sendStatus(401);
     }
 
-    if (req.user.role !== "diler") {
-        const status: IResponse = {
-            status: 401
-        }
-
-        return res.json(status);
+    if (req.user.role !== "admin") {
+        return res.sendStatus(401);
     }
 
     next();

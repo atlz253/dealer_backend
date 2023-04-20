@@ -1,14 +1,14 @@
 import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
 import IProduct from "audio_diler_common/interfaces/IProduct";
 import express, { Request, Response, response } from "express";
-import dilerAuthCheck from "./dilerAuthCheck";
-import jwtCheck from "./jwtCheck";
+import dilerAuthCheck from "../dilerAuthCheck";
+import jwtCheck from "../jwtCheck";
 import IResponse from "audio_diler_common/interfaces/IResponse";
-import pool from "./DB/pool";
+import pool from "../DB/pool";
 import { error } from "console";
-import DB from "./DB/DB";
+import DB from "../DB/DB";
 import ID from "audio_diler_common/interfaces/ID";
-import RequestBody from "./interfaces/RequestBody";
+import RequestBody from "../interfaces/RequestBody";
 
 const productsRouter = express.Router();
 
@@ -26,9 +26,7 @@ productsRouter.get('/', async (req: RequestBody, res: Response<IResponse<IBasePr
     } catch (error) {
         console.error(error);
         
-        return res.json({
-            status: 400
-        });
+        return res.sendStatus(400);
     }
 });
 
