@@ -80,4 +80,20 @@ productsRouter.put("/:productID", async (req: RequestBody<IProduct>, res: Respon
     }
 });
 
+productsRouter.delete("/:productID", async (req: RequestBody, res: Response<IResponse>) => {
+    try {
+        await DB.Products.Delete(Number(req.params.productID));
+
+        return res.json({
+            status: 200
+        });
+    } catch (error) {
+        console.error(error);
+        
+        return res.json({
+            status: 400
+        });
+    }
+});
+
 export default productsRouter;

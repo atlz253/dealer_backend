@@ -144,6 +144,20 @@ class Products {
             status: 200
         }
     }
+
+    public static async Delete(id: number): Promise<void> {
+        const query: QueryConfig = {
+            text: `
+                DELETE FROM
+                    products
+                WHERE
+                    product_id = $1
+            `,
+            values: [id]
+        }
+
+        pool.query(query);
+    }
 }
 
 export default Products;
