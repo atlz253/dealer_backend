@@ -10,6 +10,7 @@ import DB from "../DB/DB";
 import ID from "audio_diler_common/interfaces/ID";
 import RequestBody from "../interfaces/RequestBody";
 import expressAsyncHandler from "express-async-handler";
+import Logger from "../logger";
 
 const productsRouter = express.Router();
 
@@ -42,6 +43,8 @@ productsRouter.put("/:productID", expressAsyncHandler(async (req: RequestBody<IP
 
 productsRouter.delete("/:productID", expressAsyncHandler(async (req: RequestBody, res: Response<IResponse>) => {
     await DB.Products.Delete(Number(req.params.productID));
+
+    Logger.info(`${req.jwt?.login} удалил товар с ID ${req.params.productID}`);
 
     res.sendStatus(200);
 }));

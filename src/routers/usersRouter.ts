@@ -7,6 +7,7 @@ import IUser from "audio_diler_common/interfaces/IUser";
 import ID from "audio_diler_common/interfaces/ID";
 import jwtCheck from "../middleware/jwtCheck";
 import adminAuthCheck from "../middleware/adminAuthCheck";
+import Logger from "../logger";
 
 const usersRouter = express.Router();
 
@@ -45,6 +46,8 @@ usersRouter.put("/:userID", expressAsyncHandler(async (req: RequestBody<IUser>, 
 
 usersRouter.delete("/:userID", expressAsyncHandler(async (req: RequestBody, res: Response, next: NextFunction) => {
     await DB.Users.Delete(Number(req.params.userID));
+
+    Logger.info(`${req.jwt?.login} удалил пользователя с ID ${req.params.userID}`);
 
     res.sendStatus(200);
 }));

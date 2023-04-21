@@ -10,11 +10,14 @@ import errorHandler from "./middleware/errorHandler";
 import usersRouter from "./routers/usersRouter";
 import DB from "./DB/DB";
 import IUser from "audio_diler_common/interfaces/IUser";
+import Logger from "./logger";
+import httpLogger from "./middleware/httpLogger";
 
 const app: Express = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(httpLogger);
 
 app.use("/contracts", contractsRouter);
 app.use("/products", productsRouter)
@@ -36,7 +39,7 @@ app.get('/', (req: Request, res: Response) => {
 app.use(errorHandler);
 
 app.listen(port, async () => {
-  console.log(`App listening on port ${port}`);
+  Logger.info(`API доступен по адресу http://localhost:${port}`);
 
   let firstAdmin: IUser | null = await DB.Users.SelectByID(1);
 
@@ -53,6 +56,6 @@ app.listen(port, async () => {
 
     await DB.Users.Insert(firstAdmin);
 
-    console.log("Создан аккаунт первого администратора");
+    Logger.info("Создан аккаунт первого администратора");
   }
 });

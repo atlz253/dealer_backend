@@ -6,6 +6,7 @@ import expressAsyncHandler from "express-async-handler";
 import RequestBody from "../interfaces/RequestBody";
 import ILoginData from "audio_diler_common/interfaces/ILoginData";
 import DB from "../DB/DB";
+import Logger from "../logger";
 
 const loginRouter = express.Router();
 
@@ -18,6 +19,8 @@ loginRouter.post("/", expressAsyncHandler(async (req: RequestBody<ILoginData>, r
     }
 
     const accessToken = jwt.sign({ login: authInfo.login, type: authInfo.type }, accessTokenSecret);
+
+    Logger.info(`${authInfo.login} успешно авторизован`);
 
     res.json({...authInfo, accessToken});
 }));

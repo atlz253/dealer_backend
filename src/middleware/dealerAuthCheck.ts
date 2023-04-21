@@ -1,12 +1,15 @@
 import { Response, NextFunction } from "express";
-import { AuthRequest } from "./jwtCheck";
+import Logger from "../logger";
+import RequestBody from "../interfaces/RequestBody";
 
-const dilerAuthCheck = (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (req.user === undefined) {
+const dilerAuthCheck = (req: RequestBody, res: Response, next: NextFunction) => {
+    if (req.jwt === undefined) {
         return res.sendStatus(401);
     }
 
-    if (req.user.type !== "dealer") {
+    if (req.jwt.type !== "dealer") {
+        Logger.error(`Ошибка авторизации для пользователя ${req.jwt}`);
+
         return res.sendStatus(401);
     }
 

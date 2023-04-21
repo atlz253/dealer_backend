@@ -1,12 +1,15 @@
 import { Response, NextFunction } from "express";
-import { AuthRequest } from "./jwtCheck";
+import Logger from "../logger";
+import RequestBody from "../interfaces/RequestBody";
 
-const adminAuthCheck = (req: AuthRequest, res: Response, next: NextFunction) => {
-    if (req.user === undefined) {
+const adminAuthCheck = (req: RequestBody, res: Response, next: NextFunction) => {
+    if (req.jwt === undefined) {
         return res.sendStatus(401);
     }
 
-    if (req.user.type !== "admin") {
+    if (req.jwt.type !== "admin") {
+        Logger.error(`Ошибка авторизации для пользователя ${req.jwt}`);
+
         return res.sendStatus(401);
     }
 

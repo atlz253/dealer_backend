@@ -1,7 +1,8 @@
 import { ErrorRequestHandler } from "express";
+import Logger from "../logger";
 
 const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
-    console.error(err);
+    Logger.error(err);
     
     return res.sendStatus(400);
 }
