@@ -1,8 +1,8 @@
 import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
 import IProduct from "audio_diler_common/interfaces/IProduct";
 import express, { NextFunction, Request, Response, response } from "express";
-import dilerAuthCheck from "../dealerAuthCheck";
-import jwtCheck from "../jwtCheck";
+import dilerAuthCheck from "../middleware/dealerAuthCheck";
+import jwtCheck from "../middleware/jwtCheck";
 import IResponse from "audio_diler_common/interfaces/IResponse";
 import pool from "../DB/pool";
 import { error } from "console";

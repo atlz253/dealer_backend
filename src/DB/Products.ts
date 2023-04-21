@@ -138,7 +138,7 @@ class Products {
             ]
         }
 
-        pool.query(query);
+        await pool.query(query);
     }
 
     public static async Delete(id: number): Promise<void> {
@@ -152,7 +152,7 @@ class Products {
             values: [id]
         }
 
-        pool.query(query);
+        await pool.query(query);
     }
 }
 

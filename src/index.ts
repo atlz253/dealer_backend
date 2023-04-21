@@ -4,9 +4,12 @@ import contractsRouter from "./contracts";
 import productsRouter from "./routers/productsRouter";
 import bodyParser from "body-parser";
 import { port } from "./config";
-import loginRouter from "./login";
+import loginRouter from "./routers/loginRouter";
 import pool from "./DB/pool";
-import errorHandler from "./errorHandler";
+import errorHandler from "./middleware/errorHandler";
+import usersRouter from "./routers/usersRouter";
+import DB from "./DB/DB";
+import IUser from "audio_diler_common/interfaces/IUser";
 
 const app: Express = express();
 
@@ -16,6 +19,7 @@ app.use(bodyParser.json());
 app.use("/contracts", contractsRouter);
 app.use("/products", productsRouter)
 app.use("/login", loginRouter);
+app.use("/users", usersRouter);
 
 app.get('/', (req: Request, res: Response) => {
   pool.query('SELECT * FROM "Bills"', (error, result) => {
@@ -31,6 +35,24 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use(errorHandler);
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`)
+app.listen(port, async () => {
+  console.log(`App listening on port ${port}`);
+
+  let firstAdmin: IUser | null = await DB.Users.SelectByID(1);
+
+  if (firstAdmin === null) {
+    firstAdmin = {
+      id: 1,
+      type: "admin",
+      name: "admin",
+      login: "admin",
+      password: "admin",
+      employmentDate: new Date().toISOString(),
+      birthday: "",
+    }
+
+    await DB.Users.Insert(firstAdmin);
+
+    console.log("Создан аккаунт первого администратора");
+  }
 });

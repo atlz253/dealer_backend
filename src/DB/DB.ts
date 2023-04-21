@@ -1,6 +1,7 @@
 import Categories from "./Categories";
 import Manufacturers from "./Manufacturers";
 import Products from "./Products";
+import Users from "./Users";
 
 class DB {
     public static get Categories(): typeof Categories {
@@ -13,6 +14,10 @@ class DB {
 
     public static get Manufacturers(): typeof Manufacturers {
         return Manufacturers;
+    }
+
+    public static get Users(): typeof Users {
+        return Users;
     }
 }
 

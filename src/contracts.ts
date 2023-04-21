@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
 import IBaseContract from "audio_diler_common/interfaces/IBaseContract";
 import IContract from "audio_diler_common/interfaces/IContract";
-import dilerAuthCheck from "./dealerAuthCheck";
-import jwtCheck from "./jwtCheck";
+import dilerAuthCheck from "./middleware/dealerAuthCheck";
+import jwtCheck from "./middleware/jwtCheck";
 import IResponse from "audio_diler_common/interfaces/IResponse";
 
 const contractsRouter = express.Router();
