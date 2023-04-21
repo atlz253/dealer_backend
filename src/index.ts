@@ -48,7 +48,7 @@ app.listen(port, async () => {
       login: "admin",
       password: "admin",
       employmentDate: new Date().toISOString(),
-      birthday: "",
+      birthday: null
     }
 
     await DB.Users.Insert(firstAdmin);
