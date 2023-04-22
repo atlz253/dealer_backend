@@ -12,6 +12,7 @@ import DB from "./DB/DB";
 import IUser from "audio_diler_common/interfaces/IUser";
 import Logger from "./logger";
 import httpLogger from "./middleware/httpLogger";
+import billsRouter from "./routers/billsRouter";
 
 const app: Express = express();
 
@@ -23,6 +24,7 @@ app.use("/contracts", contractsRouter);
 app.use("/products", productsRouter)
 app.use("/login", loginRouter);
 app.use("/users", usersRouter);
+app.use("/bills", billsRouter);
 
 app.get('/', (req: Request, res: Response) => {
   pool.query('SELECT * FROM "Bills"', (error, result) => {

@@ -2,7 +2,7 @@ import { Response, NextFunction } from "express";
 import Logger from "../logger";
 import RequestBody from "../interfaces/RequestBody";
 
-const dilerAuthCheck = (req: RequestBody, res: Response, next: NextFunction) => {
+const dealerAuthCheck = (req: RequestBody, res: Response, next: NextFunction) => {
     if (req.jwt === undefined) {
         return res.sendStatus(401);
     }
@@ -16,4 +16,4 @@ const dilerAuthCheck = (req: RequestBody, res: Response, next: NextFunction) => 
     next();
 }
 
-export default dilerAuthCheck; 
+export default dealerAuthCheck; 

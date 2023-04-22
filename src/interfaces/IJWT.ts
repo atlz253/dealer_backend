@@ -1,6 +1,6 @@
-interface IJWT {
-    login: string,
-    type: string,
+import IUserAuthInfo from "./IUserAuthInfo";
+
+interface IJWT extends IUserAuthInfo {
     iat: number
 }
 

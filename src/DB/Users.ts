@@ -6,6 +6,7 @@ import IUser from "audio_diler_common/interfaces/IUser";
 import ID from "audio_diler_common/interfaces/ID";
 import ILoginData from "audio_diler_common/interfaces/ILoginData";
 import IUserAuthInfo from "../interfaces/IUserAuthInfo";
+import Logger from "../logger";
 
 class Users {
     public static get Types(): typeof UserTypes {
@@ -93,6 +94,42 @@ class Users {
             type: result.rows[0].type,
             login: data.login
         };
+    }
+
+    public static async SelectIDByLogin(login: string): Promise<number> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    user_id AS id
+                FROM
+                    users
+                WHERE
+                    login = $1
+            `,
+            values: [login]
+        };
+
+        const result = await pool.query<ID>(query);
+
+        return result.rows[0].id;
+    }
+
+    public static async SelectNameByID(id: number): Promise<string> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    name
+                FROM
+                    users
+                WHERE
+                    user_id = $1
+            `,
+            values: [id]
+        };
+
+        const result = await pool.query<{ name: string }>(query);
+
+        return result.rows[0].name;
     }
 
     public static async Insert(user: IUser): Promise<ID> {

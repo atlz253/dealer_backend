@@ -1,14 +1,14 @@
 import express, { Request, Response } from "express";
 import IBaseContract from "audio_diler_common/interfaces/IBaseContract";
 import IContract from "audio_diler_common/interfaces/IContract";
-import dilerAuthCheck from "./middleware/dealerAuthCheck";
+import dealerAuthCheck from "./middleware/dealerAuthCheck";
 import jwtCheck from "./middleware/jwtCheck";
 import IResponse from "audio_diler_common/interfaces/IResponse";
 
 const contractsRouter = express.Router();
 
 contractsRouter.use(jwtCheck);
-contractsRouter.use(dilerAuthCheck);
+contractsRouter.use(dealerAuthCheck);
 
 contractsRouter.get('/', (req: Request, res: Response) => {
     const mockup: IBaseContract[] = [
@@ -59,20 +59,26 @@ contractsRouter.get('/:contractID', (req: Request, res: Response) => {
         price: 999,
         date: Date.now(),
         sellerBill: {
+            id: 0,
             ownerName: "Дмитрий Дмитриевич Столяров",
             billNumber: "12345678901234567890",
             bankName: "ОАО «Альфа-банк»",
             correspondentBill: "12345",
             BIC: "1111",
-            INN: "2222"
+            INN: "2222",
+            expireDate: new Date().toISOString(),
+            ownerType: "dealer"
         },
         buyerBill: {
+            id: 1,
             ownerName: "Мигас Александр Сергеевич",
             billNumber: "12345678901234567890",
             bankName: "ОАО «Альфа-банк»",
             correspondentBill: "0",
             BIC: "0",
-            INN: "0"
+            INN: "0",
+            expireDate: new Date().toISOString(),
+            ownerType: "client"
         },
         products: [
             {

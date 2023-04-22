@@ -1,7 +1,7 @@
 import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
 import IProduct from "audio_diler_common/interfaces/IProduct";
 import express, { NextFunction, Request, Response, response } from "express";
-import dilerAuthCheck from "../middleware/dealerAuthCheck";
+import dealerAuthCheck from "../middleware/dealerAuthCheck";
 import jwtCheck from "../middleware/jwtCheck";
 import IResponse from "audio_diler_common/interfaces/IResponse";
 import pool from "../DB/pool";
@@ -15,7 +15,7 @@ import Logger from "../logger";
 const productsRouter = express.Router();
 
 productsRouter.use(jwtCheck);
-productsRouter.use(dilerAuthCheck);
+productsRouter.use(dealerAuthCheck);
 
 productsRouter.get('/', expressAsyncHandler(async (req: RequestBody, res: Response<IBaseProduct[]>, next: NextFunction) => {
     const products = await DB.Products.SelectAll();
