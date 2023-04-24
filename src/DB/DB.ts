@@ -1,6 +1,7 @@
 import Banks from "./Banks";
 import Bills from "./Bills";
 import Categories from "./Categories";
+import Clients from "./Clients";
 import Manufacturers from "./Manufacturers";
 import Products from "./Products";
 import Users from "./Users";
@@ -28,6 +29,10 @@ class DB {
 
     public static get Banks(): typeof Banks {
         return Banks;
+    }
+
+    public static get Clients(): typeof Clients {
+        return Clients;
     }
 }
 

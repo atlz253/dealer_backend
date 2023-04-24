@@ -13,6 +13,7 @@ import IUser from "audio_diler_common/interfaces/IUser";
 import Logger from "./logger";
 import httpLogger from "./middleware/httpLogger";
 import billsRouter from "./routers/billsRouter";
+import clientsRouter from "./routers/clientsRouter";
 
 const app: Express = express();
 
@@ -21,7 +22,8 @@ app.use(bodyParser.json());
 app.use(httpLogger);
 
 app.use("/contracts", contractsRouter);
-app.use("/products", productsRouter)
+app.use("/products", productsRouter);
+app.use("/clients", clientsRouter);
 app.use("/login", loginRouter);
 app.use("/users", usersRouter);
 app.use("/bills", billsRouter);
