@@ -19,16 +19,16 @@
 		"scope": "typescript",
 		"prefix": "query",
 		"body": [
-			"public static async ${1:Method}(): Promise<${2:void}> {",
+			"public static async ${1:Method}($2): Promise<${3:void}> {",
 			"\tconst query: QueryConfig = {",
 			"\t\ttext: `",
-			"\t\t\t${3}",
+			"\t\t\t${4}",
 			"\t\t`",
 			"\t};",
 			"",
-			"\tconst result = await pool.query<${2:void}>(query);",
+			"\tconst result = await pool.query<${3:void}>(query);",
 			"",
-			"\treturn ${4:result.rows};",
+			"\treturn ${5:result.rows};",
 			"}"
 		]
 	},

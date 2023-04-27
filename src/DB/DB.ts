@@ -1,7 +1,10 @@
+import Admins from "./Admins";
+import Authorizations from "./Authorizations";
 import Banks from "./Banks";
 import Bills from "./Bills";
 import Categories from "./Categories";
 import Clients from "./Clients";
+import FirstNames from "./FirstNames";
 import Manufacturers from "./Manufacturers";
 import Products from "./Products";
 import Users from "./Users";
@@ -33,6 +36,18 @@ class DB {
 
     public static get Clients(): typeof Clients {
         return Clients;
+    }
+
+    public static get Admins(): typeof Admins {
+        return Admins;
+    }
+
+    public static get Autorizations(): typeof Authorizations {
+        return Authorizations;
+    }
+
+    public static get FirstNames(): typeof FirstNames {
+        return FirstNames;
     }
 }
 
