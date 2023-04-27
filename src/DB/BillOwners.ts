@@ -68,22 +68,22 @@ class BillOwners {
         return result.rows[0];
     }
 
-    public static async SelectOwnerNameByID(id: number): Promise<string> {
-        const owner = await this.Select(id);
+    // public static async SelectOwnerNameByID(id: number): Promise<string> {
+    //     const owner = await this.Select(id);
 
-        if (owner.dealerID !== null) {
-            return await DB.Users.SelectNameByID(owner.dealerID);
-        }
-        else if (owner.clientID !== null) {
-            return "";
-        }
-        else if (owner.providerID !== null) {
-            return "";
-        }
-        else {
-            throw Error("Не удалось определить тип владельца счета");
-        }
-    }
+    //     if (owner.dealerID !== null) {
+    //         return await DB.Users.SelectNameByID(owner.dealerID);
+    //     }
+    //     else if (owner.clientID !== null) {
+    //         return "";
+    //     }
+    //     else if (owner.providerID !== null) {
+    //         return "";
+    //     }
+    //     else {
+    //         throw Error("Не удалось определить тип владельца счета");
+    //     }
+    // }
 }
 
 export default BillOwners;

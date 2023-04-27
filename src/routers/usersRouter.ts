@@ -1,51 +1,101 @@
 import express, { NextFunction, Response } from "express";
 import expressAsyncHandler from "express-async-handler";
 import RequestBody from "../interfaces/RequestBody";
-import IBaseUser from "audio_diler_common/interfaces/IBaseUser";
 import DB from "../DB/DB";
-import IUser from "audio_diler_common/interfaces/IUser";
 import ID from "audio_diler_common/interfaces/ID";
 import jwtCheck from "../middleware/jwtCheck";
 import adminAuthCheck from "../middleware/adminAuthCheck";
 import Logger from "../logger";
+import IDealer from "audio_diler_common/interfaces/IDealer";
+import IUser from "audio_diler_common/interfaces/IUser";
 
 const usersRouter = express.Router();
 
 usersRouter.use(jwtCheck);
 usersRouter.use(adminAuthCheck);
 
-usersRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseUser[]>, next: NextFunction) => {
-    const users = await DB.Users.SelectAll();
+usersRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IUser[]>, next: NextFunction) => {
+    const admins = await DB.Admins.Select();
+    const dealers = await DB.Dealers.Select();
+
+    const users = [...admins, ...dealers];
 
     res.send(users);
 }));
 
 usersRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IUser>, res: Response<ID>, next: NextFunction) => {
-    const id = await DB.Users.Insert(req.body);
+    if (req.body.login === undefined || req.body.password === undefined) {
+        throw new Error("Не были переданы данные для авторизации");
+    }
 
-    res.send(id);
+    let id: number;
+
+    switch (req.body.type) {
+        case "admin":
+            id = await DB.Admins.Insert(req.body);
+
+            break;
+        case "dealer":
+            id = await DB.Dealers.Insert(req.body as IDealer);
+
+            break;
+        default:
+            throw new Error("Не удалось определить тип добавляемого пользователя");
+    }
+
+    res.send({ id });
 }));
 
 usersRouter.get("/:userID", expressAsyncHandler(async (req: RequestBody, res: Response<IUser>, next: NextFunction) => {
     const id = Number(req.params.userID);
-    
-    const user = await DB.Users.SelectByID(id);
+
+    let user: IUser | null = await DB.Dealers.SelectByAuthID(id);
 
     if (user === null) {
-        throw Error(`Пользователь с ID ${id} не найден`);
+        user = await DB.Admins.SelectByAuthID(id);
+
+        if (user === null) {
+            throw new Error(`Пользователь с ID ${id} не найден`);
+        }
     }
 
     res.send(user);
 }));
 
 usersRouter.put("/:userID", expressAsyncHandler(async (req: RequestBody<IUser>, res: Response, next: NextFunction) => {
-    await DB.Users.Update(req.body);
+    switch (req.body.type) {
+        case "admin":
+            await DB.Admins.Update(req.body);
+
+            break;
+        case "dealer":
+            await DB.Dealers.Update(req.body as IDealer);
+
+            break;
+        default:
+            throw new Error("Не удалось определить тип изменяемого пользователя");
+    }
 
     res.sendStatus(200);
 }));
 
 usersRouter.delete("/:userID", expressAsyncHandler(async (req: RequestBody, res: Response, next: NextFunction) => {
-    await DB.Users.Delete(Number(req.params.userID));
+    const id = Number(req.params.userID);
+    
+    if (id === 1) {
+        throw new Error("Первого администратора удалять запрещено");
+    }
+
+    const dealerID = await DB.Dealers.SelectIDByAuthID(id);
+
+    if (dealerID !== null) {
+        await DB.Dealers.Delete(id);
+    }
+    else {
+        await DB.Admins.Delete(id);
+    }
+
+    await DB.Autorizations.Delete(id);
 
     Logger.info(`${req.jwt?.login} удалил пользователя с ID ${req.params.userID}`);
 

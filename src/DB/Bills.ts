@@ -20,88 +20,88 @@ class Bills {
         return BillOwners;
     }
 
-    public static async SelectByID(id: number): Promise<IBaseBill[]> {
-        const query: QueryConfig = {
-            text: `
-                SELECT
-                    bills.bill_id AS id,
-                    bills.bill_number as "billNumber",
-                    banks.name as "bankName",
-                    bills.expires as "expireDate",
-                    bills.bill_owner_id as "ownerID"
-                FROM
-                    bills,
-                    banks
-                WHERE
-                    bills.bank_id = banks.bank_id
-            `
-        }
+    // public static async SelectByID(id: number): Promise<IBaseBill[]> {
+    //     const query: QueryConfig = {
+    //         text: `
+    //             SELECT
+    //                 bills.bill_id AS id,
+    //                 bills.bill_number as "billNumber",
+    //                 banks.name as "bankName",
+    //                 bills.expires as "expireDate",
+    //                 bills.bill_owner_id as "ownerID"
+    //             FROM
+    //                 bills,
+    //                 banks
+    //             WHERE
+    //                 bills.bank_id = banks.bank_id
+    //         `
+    //     }
 
-        const result = await pool.query<IQueryBaseBill>(query);
+    //     const result = await pool.query<IQueryBaseBill>(query);
 
-        const bills: IBaseBill[] = []; 
+    //     const bills: IBaseBill[] = []; 
         
-        for (let i = 0; i < result.rowCount; i++) {
-            const bill = result.rows[i];
+    //     for (let i = 0; i < result.rowCount; i++) {
+    //         const bill = result.rows[i];
             
-            if (bill.ownerID === undefined) {
-                Logger.error(`ID владельца не определен для ${bill.id}`)
+    //         if (bill.ownerID === undefined) {
+    //             Logger.error(`ID владельца не определен для ${bill.id}`)
 
-                continue;
-            } 
+    //             continue;
+    //         } 
 
-            const billOwner = await this.Owners.Select(bill.ownerID);
+    //         const billOwner = await this.Owners.Select(bill.ownerID);
 
-            if (billOwner.dealerID !== id) {
-                continue;
-            }
+    //         if (billOwner.dealerID !== id) {
+    //             continue;
+    //         }
 
-            bill.ownerName = await DB.Users.SelectNameByID(id);
+    //         bill.ownerName = await DB.Users.SelectNameByID(id);
 
-            delete bill.ownerID
+    //         delete bill.ownerID
 
-            bills.push(bill);
-        }
+    //         bills.push(bill);
+    //     }
 
-        return bills;
-    }
+    //     return bills;
+    // }
 
-    public static async Select(id: number): Promise<IBill> {
-        const query: QueryConfig = {
-            text: `
-            SELECT
-                bills.bill_id AS id,
-                bills.bill_number as "billNumber",
-                banks.name as "bankName",
-                bills.expires as "expireDate",
-                bills.bill_owner_id as "ownerID",
-                bills.correspondent_bill as "correspondentBill",
-                bills.bic as "BIC",
-                bills.inn as "INN"
-            FROM
-                bills,
-                banks
-            WHERE
-                bill_id = $1 AND
-                bills.bank_id = banks.bank_id
-            `,
-            values: [id]
-        };
+    // public static async Select(id: number): Promise<IBill> {
+    //     const query: QueryConfig = {
+    //         text: `
+    //         SELECT
+    //             bills.bill_id AS id,
+    //             bills.bill_number as "billNumber",
+    //             banks.name as "bankName",
+    //             bills.expires as "expireDate",
+    //             bills.bill_owner_id as "ownerID",
+    //             bills.correspondent_bill as "correspondentBill",
+    //             bills.bic as "BIC",
+    //             bills.inn as "INN"
+    //         FROM
+    //             bills,
+    //             banks
+    //         WHERE
+    //             bill_id = $1 AND
+    //             bills.bank_id = banks.bank_id
+    //         `,
+    //         values: [id]
+    //     };
 
-        const result = await pool.query<IQueryBill>(query);
+    //     const result = await pool.query<IQueryBill>(query);
 
-        const bill = result.rows[0];
+    //     const bill = result.rows[0];
 
-        if (bill.ownerID === undefined) {
-            throw Error(`ID владельца не определен для ${bill.id}`);
-        }
+    //     if (bill.ownerID === undefined) {
+    //         throw Error(`ID владельца не определен для ${bill.id}`);
+    //     }
 
-        bill.ownerName = await this.Owners.SelectOwnerNameByID(bill.ownerID);
+    //     bill.ownerName = await this.Owners.SelectOwnerNameByID(bill.ownerID);
 
-        delete bill.ownerID;
+    //     delete bill.ownerID;
 
-        return bill;
-    }
+    //     return bill;
+    // }
 
     public static async Insert(bill: IBill, owner_type: string, owner_id: number): Promise<ID> {
         const bankID = await DB.Banks.GetIDByName(bill.bankName);

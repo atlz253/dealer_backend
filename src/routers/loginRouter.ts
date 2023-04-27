@@ -4,25 +4,33 @@ import { accessTokenSecret } from "../config";
 import IAuth from "audio_diler_common/interfaces/IAuth";
 import expressAsyncHandler from "express-async-handler";
 import RequestBody from "../interfaces/RequestBody";
-import ILoginData from "audio_diler_common/interfaces/ILoginData";
 import DB from "../DB/DB";
 import Logger from "../logger";
+import IAuthorization from "audio_diler_common/interfaces/IAuthorization";
 
 const loginRouter = express.Router();
 
-loginRouter.post("/", expressAsyncHandler(async (req: RequestBody<ILoginData>, res: Response<IAuth>, next: NextFunction) => {
-    const authInfo = await DB.Users.SelectByLoginData(req.body);
+loginRouter.post("/", expressAsyncHandler(async (req: RequestBody<IAuthorization>, res: Response<IAuth>, next: NextFunction) => {
+    const authID = await DB.Autorizations.SelectIDByAuth(req.body);
 
-    if (authInfo === null)
+    if (authID === null)
     {
-        throw Error(`Неудачная авторизация пользователя ${req.body.login}`);
+        throw new Error(`Неудачная авторизация пользователя ${req.body.login}`);
     }
 
-    const accessToken = jwt.sign({ login: authInfo.login, type: authInfo.type }, accessTokenSecret);
+    let admin = await DB.Admins.SelectByAuthID(authID);
 
-    Logger.info(`${authInfo.login} успешно авторизован`);
+    if (admin === null) {
+        throw new Error("aaaaaaaaaaaaaaaa");
+    }
 
-    res.json({...authInfo, accessToken});
+    let userType = "admin";
+
+    const accessToken = jwt.sign({ login: req.body.login, type: userType }, accessTokenSecret);
+
+    Logger.info(`${req.body.login} успешно авторизован`);
+
+    res.json({accessToken, type: userType, login: admin?.firstName});
 }));
 
 export default loginRouter;

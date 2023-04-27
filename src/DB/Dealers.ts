@@ -1,37 +1,37 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
+import IDealer from "audio_diler_common/interfaces/IDealer";
 import ID from "audio_diler_common/interfaces/ID";
-import DB from "./DB";
-import IUser from "audio_diler_common/interfaces/IUser";
 import IAuthorization from "audio_diler_common/interfaces/IAuthorization";
+import DB from "./DB";
 
-class Admins {
-    public static async Insert(admin: IUser): Promise<number> {
-        const nameID = await DB.FirstNames.SelectIDByName(admin.firstName);
+class Dealers {
+    public static async Insert(dealer: IDealer): Promise<number> {
+        const nameID = await DB.FirstNames.SelectIDByName(dealer.firstName);
 
-        if (admin.login === undefined || admin.password === undefined) {
+        if (dealer.login === undefined || dealer.password === undefined) {
             throw new Error("Не были переданы данные для авторизации пользователя");
         }
 
-        const authorization: IAuthorization = {login: admin.login, password: admin.password};
+        const authorization: IAuthorization = {login: dealer.login, password: dealer.password};
 
         const authorizationID: number | null = await DB.Autorizations.Insert(authorization);
 
         const query: QueryConfig = {
             text: `
                 INSERT INTO
-                    admins (
+                    dealers (
                         first_name_id,
-                        authorization_id
+                        authorization_id,
+                        employment_date
                     )
                 VALUES
-                    ($1, $2)
-                RETURNING
-                    admin_id AS id
+                    ($1, $2, $3)
             `,
             values: [
                 nameID,
-                authorizationID
+                authorizationID,
+                dealer.employmentDate
             ]
         };
     
@@ -40,30 +40,54 @@ class Admins {
         return authorizationID;
     }
 
-    public static async SelectByAuthID(authID: number): Promise<IUser | null> {
+    public static async Select(): Promise<IDealer[]> {
+        const query: QueryConfig = {
+            text: `
+            SELECT
+                authorizations.login,
+                dealers.authorization_id AS id,
+                first_names.first_name AS "firstName",
+                'dealer' AS type
+            FROM
+                dealers,
+                first_names,
+                authorizations
+            WHERE
+                dealers.first_name_id = first_names.first_name_id AND 
+                dealers.authorization_id = authorizations.authorization_id
+            `
+        };
+    
+        const result = await pool.query<IDealer>(query);
+    
+        return result.rows;
+    }
+
+    public static async SelectByAuthID(authID: number): Promise<IDealer | null> {
         const query: QueryConfig = {
             text: `
                 SELECT
                     authorizations.authorization_id AS id,
+                    dealers.employment_date AS "employmentDate",
                     first_names.first_name AS "firstName",
                     authorizations.login,
                     authorizations.password,
-                    'admin' AS type
+                    'dealer' AS type
                 FROM
-                    admins,
+                    dealers,
                     first_names,
                     authorizations
                 WHERE
-                    admins.authorization_id = $1 AND
-                    admins.authorization_id = authorizations.authorization_id AND
-                    admins.first_name_id = first_names.first_name_id
+                    dealers.authorization_id = $1 AND
+                    dealers.authorization_id = authorizations.authorization_id AND
+                    dealers.first_name_id = first_names.first_name_id
             `,
             values: [
                 authID
             ]
         };
     
-        const result = await pool.query<IUser>(query);
+        const result = await pool.query<IDealer>(query);
     
         if (result.rowCount === 0) {
             return null;
@@ -76,9 +100,9 @@ class Admins {
         const query: QueryConfig = {
             text: `
                 SELECT
-                    admin_id AS id
+                    dealer_id AS id
                 FROM
-                    admins
+                    dealers
                 WHERE
                     authorization_id = $1
             `,
@@ -96,30 +120,7 @@ class Admins {
         return result.rows[0];
     }
 
-    public static async Select(): Promise<IUser[]> {
-        const query: QueryConfig = {
-            text: `
-                SELECT
-                    authorizations.login,
-                    authorizations.authorization_id AS id,
-                    first_names.first_name AS "firstName",
-                    'admin' AS type
-                FROM
-                    admins,
-                    first_names,
-                    authorizations
-                WHERE
-                    admins.first_name_id = first_names.first_name_id AND 
-                    admins.authorization_id = authorizations.authorization_id
-            `
-        };
-    
-        const result = await pool.query<IUser>(query);
-    
-        return result.rows;
-    }
-
-    public static async Update(dealer: IUser): Promise<void> {
+    public static async Update(dealer: IDealer): Promise<void> {
         const nameID = await DB.FirstNames.SelectIDByName(dealer.firstName);
         
         if (dealer.login === undefined || dealer.password === undefined) {
@@ -131,14 +132,16 @@ class Admins {
         const query: QueryConfig = {
             text: `
                 UPDATE
-                    admins
+                    dealers
                 SET
-                    first_name_id = $1
+                    employment_date = $1,
+                    first_name_id = $2
                 WHERE
-                    authorization_id = $2
+                    authorization_id = $3
             `,
 
             values: [
+                dealer.employmentDate,
                 nameID,
                 dealer.id
             ]
@@ -151,7 +154,7 @@ class Admins {
         const query: QueryConfig = {
             text: `
                 DELETE FROM
-                    admins
+                    dealers
                 WHERE
                     authorization_id = $1;
             `,
@@ -164,4 +167,4 @@ class Admins {
     }
 }
 
-export default Admins;
+export default Dealers;

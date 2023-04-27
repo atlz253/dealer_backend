@@ -6,9 +6,9 @@ class FirstNames {
     private static async Insert(firstName: string): Promise<number> {
         const query: QueryConfig = {
             text: `
-                INSERT
+                INSERT INTO
                     first_names (
-                        name
+                        first_name
                     )
                 VALUES
                     (
@@ -27,15 +27,15 @@ class FirstNames {
         return result.rows[0].id;
     }
 
-    public static async GetIDByName(firstName: string): Promise<number> {
+    public static async SelectIDByName(firstName: string): Promise<number> {
         const query: QueryConfig = {
             text: `
             SELECT 
-                first_name_id as id 
+                first_name_id AS id 
             FROM 
                 first_names 
             WHERE 
-                name = $1
+                first_name = $1
             `,
             values: [
                 firstName

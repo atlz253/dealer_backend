@@ -9,11 +9,11 @@ import pool from "./DB/pool";
 import errorHandler from "./middleware/errorHandler";
 import usersRouter from "./routers/usersRouter";
 import DB from "./DB/DB";
-import IUser from "audio_diler_common/interfaces/IUser";
 import Logger from "./logger";
 import httpLogger from "./middleware/httpLogger";
 import billsRouter from "./routers/billsRouter";
 import clientsRouter from "./routers/clientsRouter";
+import IUser from "audio_diler_common/interfaces/IUser";
 
 const app: Express = express();
 
@@ -45,20 +45,18 @@ app.use(errorHandler);
 app.listen(port, async () => {
   Logger.info(`API доступен по адресу http://localhost:${port}`);
 
-  let firstAdmin: IUser | null = await DB.Users.SelectByID(1);
+  let firstAdmin: IUser | null = await DB.Admins.SelectByAuthID(1);
 
   if (firstAdmin === null) {
     firstAdmin = {
       id: 1,
-      type: "admin",
-      name: "admin",
+      firstName: "admin",
       login: "admin",
       password: "admin",
-      employmentDate: new Date().toISOString(),
-      birthday: null
+      type: "admin"
     }
 
-    await DB.Users.Insert(firstAdmin);
+    await DB.Admins.Insert(firstAdmin);
 
     Logger.info("Создан аккаунт первого администратора");
   }

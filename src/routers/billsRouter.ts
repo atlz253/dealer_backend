@@ -14,37 +14,37 @@ const billsRouter = express.Router();
 billsRouter.use(jwtCheck);
 billsRouter.use(dealerAuthCheck);
 
-billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseBill[]>) => {
-    if (req.jwt === undefined)
-    {
-        throw Error("Произошла попытка создания счета для неавторизованного пользователя");
-    }
+// billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseBill[]>) => {
+//     if (req.jwt === undefined)
+//     {
+//         throw Error("Произошла попытка создания счета для неавторизованного пользователя");
+//     }
     
-    const ownerID = await DB.Users.SelectIDByLogin(req.jwt.login);
+//     const ownerID = await DB.Users.SelectIDByLogin(req.jwt.login);
     
-    const bills = await DB.Bills.SelectByID(ownerID);
+//     const bills = await DB.Bills.SelectByID(ownerID);
 
-    res.json(bills);
-}));
+//     res.json(bills);
+// }));
 
-billsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response<ID>) => {
-    if (req.jwt === undefined)
-    {
-        throw Error("Произошла попытка создания счета для неавторизованного пользователя");
-    }
+// billsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response<ID>) => {
+//     if (req.jwt === undefined)
+//     {
+//         throw Error("Произошла попытка создания счета для неавторизованного пользователя");
+//     }
     
-    const ownerID = await DB.Users.SelectIDByLogin(req.jwt.login);
+//     const ownerID = await DB.Users.SelectIDByLogin(req.jwt.login);
 
-    const result = await DB.Bills.Insert(req.body, req.jwt.type, ownerID);
+//     const result = await DB.Bills.Insert(req.body, req.jwt.type, ownerID);
 
-    res.json(result);
-}));
+//     res.json(result);
+// }));
 
-billsRouter.get("/:billID", expressAsyncHandler(async (req: RequestBody, res: Response<IBill>) => {
-    const bill = await DB.Bills.Select(Number(req.params.billID));
+// billsRouter.get("/:billID", expressAsyncHandler(async (req: RequestBody, res: Response<IBill>) => {
+//     const bill = await DB.Bills.Select(Number(req.params.billID));
 
-    res.json(bill);
-}));
+//     res.json(bill);
+// }));
 
 billsRouter.put("/:billID", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response) => {
     await DB.Bills.Update(req.body);
