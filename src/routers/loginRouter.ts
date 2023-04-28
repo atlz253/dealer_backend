@@ -7,6 +7,7 @@ import RequestBody from "../interfaces/RequestBody";
 import DB from "../DB/DB";
 import Logger from "../logger";
 import IAuthorization from "audio_diler_common/interfaces/IAuthorization";
+import IUser from "audio_diler_common/interfaces/IUser";
 
 const loginRouter = express.Router();
 
@@ -18,19 +19,21 @@ loginRouter.post("/", expressAsyncHandler(async (req: RequestBody<IAuthorization
         throw new Error(`Неудачная авторизация пользователя ${req.body.login}`);
     }
 
-    let admin = await DB.Admins.SelectByAuthID(authID);
+    let user : IUser | null = await DB.Dealers.SelectByAuthID(authID);
 
-    if (admin === null) {
-        throw new Error("aaaaaaaaaaaaaaaa");
+    if (user === null) {
+        user = await DB.Admins.SelectByAuthID(authID);
+
+        if (user === null) {
+            throw new Error("Не удалось найти пользователя по переданным данным авторизации");
+        }
     }
 
-    let userType = "admin";
-
-    const accessToken = jwt.sign({ login: req.body.login, type: userType }, accessTokenSecret);
+    const accessToken = jwt.sign({ login: req.body.login, type: user.type, id: user.id }, accessTokenSecret);
 
     Logger.info(`${req.body.login} успешно авторизован`);
 
-    res.json({accessToken, type: userType, login: admin?.firstName});
+    res.json({accessToken, type: user.type, login: user.firstName});
 }));
 
 export default loginRouter;

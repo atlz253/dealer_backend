@@ -67,7 +67,7 @@ class Dealers {
         const query: QueryConfig = {
             text: `
                 SELECT
-                    authorizations.authorization_id AS id,
+                    dealers.dealer_id AS id,
                     dealers.employment_date AS "employmentDate",
                     first_names.first_name AS "firstName",
                     authorizations.login,
@@ -118,6 +118,28 @@ class Dealers {
         }
 
         return result.rows[0];
+    }
+
+    public static async SelectNameByAuthID(authID: number): Promise<string> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    first_names.first_name AS "firstName"
+                FROM
+                    dealers,
+                    first_names
+                WHERE
+                    dealers.authorization_id = $1 AND
+                    dealers.first_name_id = first_names.first_name_id
+            `,
+            values: [
+                authID
+            ]
+        };
+    
+        const result = await pool.query<{firstName: string}>(query);
+    
+        return result.rows[0].firstName;
     }
 
     public static async Update(dealer: IDealer): Promise<void> {

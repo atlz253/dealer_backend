@@ -4,109 +4,82 @@ import pool from "./pool";
 import IBill from "audio_diler_common/interfaces/IBill";
 import ID from "audio_diler_common/interfaces/ID";
 import DB from "./DB";
-import BillOwners from "./BillOwners";
 import Logger from "../logger";
-
-interface IQueryBaseBill extends IBaseBill {
-    ownerID?: number
-}
-
-interface IQueryBill extends IBill {
-    ownerID?: number
-}
+import BillsDealers from "./BillsDealers";
 
 class Bills {
-    public static get Owners(): typeof BillOwners {
-        return BillOwners;
+    public static get BillsDealers(): typeof BillsDealers {
+        return BillsDealers;
     }
 
-    // public static async SelectByID(id: number): Promise<IBaseBill[]> {
-    //     const query: QueryConfig = {
-    //         text: `
-    //             SELECT
-    //                 bills.bill_id AS id,
-    //                 bills.bill_number as "billNumber",
-    //                 banks.name as "bankName",
-    //                 bills.expires as "expireDate",
-    //                 bills.bill_owner_id as "ownerID"
-    //             FROM
-    //                 bills,
-    //                 banks
-    //             WHERE
-    //                 bills.bank_id = banks.bank_id
-    //         `
-    //     }
+    public static async SelectDealerBill(billID: number, dealerID: number): Promise<IBill> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    bills.bill_id AS id,
+                    bills.bill_number AS "billNumber",
+                    banks.name AS "bankName",
+                    bills.expires AS "expireDate",
+                    bills.correspondent_bill AS "correspondentBill",
+                    bills.bic AS "BIC",
+                    bills.inn AS "INN",
+                    first_names.first_name AS "ownerName"
+                FROM
+                    bills,
+                    banks,
+                    dealers,
+                    first_names
+                WHERE
+                    bills.bill_id = $1 AND
+                    dealers.dealer_id = $2 AND
+                    bills.bank_id = banks.bank_id AND
+                    dealers.first_name_id = first_names.first_name_id
+            `,
+            values: [
+                billID,
+                dealerID
+            ]
+        };
+    
+        const result = await pool.query<IBill>(query);
+    
+        return result.rows[0];
+    }
 
-    //     const result = await pool.query<IQueryBaseBill>(query);
+    public static async SelectByDealerID(dealerID: number): Promise<IBaseBill[]> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    bills.bill_id AS id,
+                    bills.bill_number AS "billNumber",
+                    banks.name AS "bankName",
+                    bills.expires AS "expireDate",
+                    first_names.first_name AS "ownerName"
+                FROM
+                    bills,
+                    banks,
+                    dealers,
+                    first_names,
+                    bills_dealers
+                WHERE
+                    dealers.dealer_id = $1 AND
+                    bills.bank_id = banks.bank_id AND
+                    bills_dealers.dealers_dealer_id = $1 AND
+                    bills_dealers.bills_bill_id = bills.bill_id AND
+                    dealers.first_name_id = first_names.first_name_id
+            `,
+            values: [
+                dealerID
+            ]
+        };
+    
+        const result = await pool.query<IBaseBill>(query);
+    
+        return result.rows;
+    }
 
-    //     const bills: IBaseBill[] = []; 
-        
-    //     for (let i = 0; i < result.rowCount; i++) {
-    //         const bill = result.rows[i];
-            
-    //         if (bill.ownerID === undefined) {
-    //             Logger.error(`ID владельца не определен для ${bill.id}`)
-
-    //             continue;
-    //         } 
-
-    //         const billOwner = await this.Owners.Select(bill.ownerID);
-
-    //         if (billOwner.dealerID !== id) {
-    //             continue;
-    //         }
-
-    //         bill.ownerName = await DB.Users.SelectNameByID(id);
-
-    //         delete bill.ownerID
-
-    //         bills.push(bill);
-    //     }
-
-    //     return bills;
-    // }
-
-    // public static async Select(id: number): Promise<IBill> {
-    //     const query: QueryConfig = {
-    //         text: `
-    //         SELECT
-    //             bills.bill_id AS id,
-    //             bills.bill_number as "billNumber",
-    //             banks.name as "bankName",
-    //             bills.expires as "expireDate",
-    //             bills.bill_owner_id as "ownerID",
-    //             bills.correspondent_bill as "correspondentBill",
-    //             bills.bic as "BIC",
-    //             bills.inn as "INN"
-    //         FROM
-    //             bills,
-    //             banks
-    //         WHERE
-    //             bill_id = $1 AND
-    //             bills.bank_id = banks.bank_id
-    //         `,
-    //         values: [id]
-    //     };
-
-    //     const result = await pool.query<IQueryBill>(query);
-
-    //     const bill = result.rows[0];
-
-    //     if (bill.ownerID === undefined) {
-    //         throw Error(`ID владельца не определен для ${bill.id}`);
-    //     }
-
-    //     bill.ownerName = await this.Owners.SelectOwnerNameByID(bill.ownerID);
-
-    //     delete bill.ownerID;
-
-    //     return bill;
-    // }
-
-    public static async Insert(bill: IBill, owner_type: string, owner_id: number): Promise<ID> {
+    public static async Insert(bill: IBill): Promise<ID> {
         const bankID = await DB.Banks.GetIDByName(bill.bankName);
-        const ownerID = await DB.Bills.Owners.SelectOwnerIDByDealerID(owner_id); // TODO: ownerID в зависимости от типа пользователя
-        const expiresDate = new Date(bill.expireDate).toLocaleDateString();
 
         const query: QueryConfig = {
             text: `
@@ -117,34 +90,31 @@ class Bills {
                         correspondent_bill,
                         bic,
                         inn,
-                        bill_owner_id,
                         expires
                     )
                 VALUES
-                    ($1, $2, $3, $4, $5, $6, $7)
-                RETURNING 
+                    ($1, $2, $3, $4, $5, $6)
+                RETURNING
                     bill_id AS id
             `,
             values: [
-                bill.billNumber, 
-                bankID, 
-                bill.correspondentBill, 
-                bill.BIC, 
+                bill.billNumber,
+                bankID,
+                bill.correspondentBill,
+                bill.BIC,
                 bill.INN,
-                ownerID,
-                expiresDate                
+                bill.expireDate
             ]
-        }
-
+        };
+    
         const result = await pool.query<ID>(query);
-
+    
         return result.rows[0];
     }
 
-    public static async Update(bill: IBill): Promise<void> { // FIXME: обновление уникальных значений вызывает ошибку
+    public static async Update(bill: IBill): Promise<void> {
         const bankID = await DB.Banks.GetIDByName(bill.bankName);
-        const expiresDate = new Date(bill.expireDate).toLocaleDateString();
-
+        
         const query: QueryConfig = {
             text: `
                 UPDATE
@@ -155,7 +125,7 @@ class Bills {
                     correspondent_bill = $3,
                     bic = $4,
                     inn = $5,
-                    expires = $6
+                    expires = $6	
                 WHERE
                     bill_id = $7
             `,
@@ -165,11 +135,11 @@ class Bills {
                 bill.correspondentBill,
                 bill.BIC,
                 bill.INN,
-                expiresDate,
+                bill.expireDate,
                 bill.id
             ]
         };
-
+    
         await pool.query(query);
     }
 
@@ -181,9 +151,11 @@ class Bills {
                 WHERE
                     bill_id = $1
             `,
-            values: [id]
-        }
-
+            values: [
+                id
+            ]
+        };
+    
         await pool.query(query);
     }
 }

@@ -1,4 +1,5 @@
 interface IUserAuthInfo {
+    id: number,
     type: string,
     login: string
 }

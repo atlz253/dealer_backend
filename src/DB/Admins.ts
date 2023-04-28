@@ -44,7 +44,7 @@ class Admins {
         const query: QueryConfig = {
             text: `
                 SELECT
-                    authorizations.authorization_id AS id,
+                    admins.admin_id AS id,
                     first_names.first_name AS "firstName",
                     authorizations.login,
                     authorizations.password,

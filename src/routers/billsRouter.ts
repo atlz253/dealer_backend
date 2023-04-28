@@ -14,37 +14,40 @@ const billsRouter = express.Router();
 billsRouter.use(jwtCheck);
 billsRouter.use(dealerAuthCheck);
 
-// billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseBill[]>) => {
-//     if (req.jwt === undefined)
-//     {
-//         throw Error("Произошла попытка создания счета для неавторизованного пользователя");
-//     }
+billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseBill[]>) => {
+    if (req.jwt === undefined)
+    {
+        throw new Error("Произошла попытка создания счета неавторизованным пользователем");
+    }
+
+    const bills = await DB.Bills.SelectByDealerID(req.jwt.id);
+
+    res.json(bills);
+}));
+
+billsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response<ID>) => {
+    if (req.jwt === undefined)
+    {
+        throw new Error("Произошла попытка создания счета неавторизованным пользователем");
+    }
     
-//     const ownerID = await DB.Users.SelectIDByLogin(req.jwt.login);
+    const result = await DB.Bills.Insert(req.body);
+
+    await DB.Bills.BillsDealers.Insert(req.jwt.id, result.id);
+
+    res.json(result);
+}));
+
+billsRouter.get("/:billID", expressAsyncHandler(async (req: RequestBody, res: Response<IBill>) => {
+    if (req.jwt === undefined)
+    {
+        throw new Error("Произошла попытка получения счета неавторизованным пользователем");
+    }
     
-//     const bills = await DB.Bills.SelectByID(ownerID);
+    const bill = await DB.Bills.SelectDealerBill(Number(req.params.billID), req.jwt.id);
 
-//     res.json(bills);
-// }));
-
-// billsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response<ID>) => {
-//     if (req.jwt === undefined)
-//     {
-//         throw Error("Произошла попытка создания счета для неавторизованного пользователя");
-//     }
-    
-//     const ownerID = await DB.Users.SelectIDByLogin(req.jwt.login);
-
-//     const result = await DB.Bills.Insert(req.body, req.jwt.type, ownerID);
-
-//     res.json(result);
-// }));
-
-// billsRouter.get("/:billID", expressAsyncHandler(async (req: RequestBody, res: Response<IBill>) => {
-//     const bill = await DB.Bills.Select(Number(req.params.billID));
-
-//     res.json(bill);
-// }));
+    res.json(bill);
+}));
 
 billsRouter.put("/:billID", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response) => {
     await DB.Bills.Update(req.body);
@@ -53,7 +56,16 @@ billsRouter.put("/:billID", expressAsyncHandler(async (req: RequestBody<IBill>, 
 }));
 
 billsRouter.delete("/:billID", expressAsyncHandler(async (req: RequestBody, res: Response) => {
-    await DB.Bills.Delete(Number(req.params.billID));
+    if (req.jwt === undefined)
+    {
+        throw new Error("Произошла попытка удаления счета неавторизованным пользователем");
+    }
+    
+    const billID = Number(req.params.billID);
+
+    await DB.Bills.BillsDealers.Delete(billID);
+
+    await DB.Bills.Delete(billID);
 
     res.sendStatus(200);
 }));
