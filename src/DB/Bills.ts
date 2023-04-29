@@ -6,10 +6,15 @@ import ID from "audio_diler_common/interfaces/ID";
 import DB from "./DB";
 import Logger from "../logger";
 import BillsDealers from "./BillsDealers";
+import BillsClients from "./BillsClients";
 
 class Bills {
     public static get BillsDealers(): typeof BillsDealers {
         return BillsDealers;
+    }
+
+    public static get BillsClients(): typeof BillsClients {
+        return BillsClients;
     }
 
     public static async SelectDealerBill(billID: number, dealerID: number): Promise<IBill> {
@@ -46,6 +51,40 @@ class Bills {
         return result.rows[0];
     }
 
+    public static async SelectClientBill(billID: number, clientID: number): Promise<IBill> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    bills.bill_id AS id,
+                    bills.bill_number AS "billNumber",
+                    banks.name AS "bankName",
+                    bills.expires AS "expireDate",
+                    bills.correspondent_bill AS "correspondentBill",
+                    bills.bic AS "BIC",
+                    bills.inn AS "INN",
+                    first_names.first_name AS "ownerName"
+                FROM
+                    bills,
+                    banks,
+                    clients,
+                    first_names
+                WHERE
+                    bills.bill_id = $1 AND
+                    clients.client_id = $2 AND
+                    bills.bank_id = banks.bank_id AND
+                    clients.first_name_id = first_names.first_name_id
+            `,
+            values: [
+                billID,
+                clientID
+            ]
+        };
+    
+        const result = await pool.query<IBill>(query);
+
+        return result.rows[0];
+    }
+
     public static async SelectByDealerID(dealerID: number): Promise<IBaseBill[]> {
         const query: QueryConfig = {
             text: `
@@ -70,6 +109,38 @@ class Bills {
             `,
             values: [
                 dealerID
+            ]
+        };
+    
+        const result = await pool.query<IBaseBill>(query);
+    
+        return result.rows;
+    }
+
+    public static async SelectByClientID(clientID: number): Promise<IBaseBill[]> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    bills.bill_id AS id,
+                    bills.bill_number AS "billNumber",
+                    banks.name AS "bankName",
+                    bills.expires AS "expireDate",
+                    first_names.first_name AS "ownerName"
+                FROM
+                    bills,
+                    banks,
+                    clients,
+                    first_names,
+                    bills_clients
+                WHERE
+                    clients.client_id = $1 AND
+                    bills.bank_id = banks.bank_id AND
+                    bills_clients.clients_client_id = $1 AND
+                    bills_clients.bills_bill_id = bills.bill_id AND
+                    clients.first_name_id = first_names.first_name_id
+            `,
+            values: [
+                clientID
             ]
         };
     

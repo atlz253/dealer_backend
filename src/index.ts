@@ -12,7 +12,7 @@ import DB from "./DB/DB";
 import Logger from "./logger";
 import httpLogger from "./middleware/httpLogger";
 import billsRouter from "./routers/billsRouter";
-import clientsRouter from "./routers/clientsRouter";
+import clientsRouter from "./routers/clientsRouter/clientsRouter";
 import IUser from "audio_diler_common/interfaces/IUser";
 
 const app: Express = express();
