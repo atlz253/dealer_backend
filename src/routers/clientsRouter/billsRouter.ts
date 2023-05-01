@@ -5,17 +5,25 @@ import DB from "../../DB/DB";
 import IBaseBill from "audio_diler_common/interfaces/IBaseBill";
 import IBill from "audio_diler_common/interfaces/IBill";
 import ID from "audio_diler_common/interfaces/ID";
+import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
 
 const billsRouter = express.Router({ 
     mergeParams: true 
 });
 
-billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseBill[]>) => {
+billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseBill[] | IBillNumber[]>) => {
     const clientID = Number(req.params.clientID);
 
-    const bills = await DB.Bills.SelectByClientID(clientID);
+    if (req.query.onlyBillNumbers) {
+        const billsNumbers = await DB.Bills.SelectBillsNumbersByClientID(clientID);
 
-    res.json(bills);
+        res.json(billsNumbers);
+    }
+    else {
+        const bills = await DB.Bills.SelectByClientID(clientID);
+
+        res.json(bills);
+    }
 }));
 
 billsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response<ID>) => {

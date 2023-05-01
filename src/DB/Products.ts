@@ -5,20 +5,15 @@ import ID from "audio_diler_common/interfaces/ID";
 import DB from "./DB";
 import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
 import IResponse from "audio_diler_common/interfaces/IResponse";
+import DBMoneyConverter from "../utils/DBMoneyConverter";
 
 class Products {
-    private static ConvertMoneyToNumber(money: any): number {
-        return Number(money.toString().replace(" ?", "").replace(",", "."));
-    }
-
-    private static ConvertNumberToMoney(number: number): string {
-        return number.toString().replace(".", ",");
-    }
+    
 
     public static async Insert(product: IProduct): Promise<ID> {
         const categoryID = await DB.Categories.GetIDByName(product.category);
         const manufacturerID = await DB.Manufacturers.GetIDByName(product.manufacturer);
-        const price = this.ConvertNumberToMoney(product.price);
+        const price = DBMoneyConverter.ConvertNumberToMoney(product.price);
 
         const query: QueryConfig = {
             text: `
@@ -66,7 +61,7 @@ class Products {
         for (let i = 0; i < result.rowCount; i++) {
             const row = result.rows[i];
             
-            row.price = this.ConvertMoneyToNumber(row.price);
+            row.price = DBMoneyConverter.ConvertMoneyToNumber(row.price);
         }
 
         return result.rows;
@@ -102,7 +97,7 @@ class Products {
         for (let i = 0; i < result.rowCount; i++) {
             const row = result.rows[i];
             
-            row.price = this.ConvertMoneyToNumber(row.price);
+            row.price = DBMoneyConverter.ConvertMoneyToNumber(row.price);
         }
 
         return result.rows[0];
@@ -111,7 +106,7 @@ class Products {
     public static async Update(product: IProduct): Promise<void> {
         const categoryID = await DB.Categories.GetIDByName(product.category);
         const manufacturerID = await DB.Manufacturers.GetIDByName(product.manufacturer);
-        const price = this.ConvertNumberToMoney(product.price);
+        const price = DBMoneyConverter.ConvertNumberToMoney(product.price);
 
         const query: QueryConfig = {
             text: `

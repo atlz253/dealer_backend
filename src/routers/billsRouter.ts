@@ -8,29 +8,35 @@ import dealerAuthCheck from "../middleware/dealerAuthCheck";
 import IBill from "audio_diler_common/interfaces/IBill";
 import ID from "audio_diler_common/interfaces/ID";
 import Logger from "../logger";
+import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
 
 const billsRouter = express.Router();
 
 billsRouter.use(jwtCheck);
 billsRouter.use(dealerAuthCheck);
 
-billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseBill[]>) => {
-    if (req.jwt === undefined)
-    {
+billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseBill[] | IBillNumber[]>) => {
+    if (req.jwt === undefined) {
         throw new Error("Произошла попытка создания счета неавторизованным пользователем");
     }
 
-    const bills = await DB.Bills.SelectByDealerID(req.jwt.id);
+    if (req.query.onlyBillNumbers) {
+        const billsNumbers = await DB.Bills.SelectBillsNumbersByDealerID(req.jwt.id);
 
-    res.json(bills);
+        res.json(billsNumbers);
+    }
+    else {
+        const bills = await DB.Bills.SelectByDealerID(req.jwt.id);
+
+        res.json(bills);
+    }
 }));
 
 billsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response<ID>) => {
-    if (req.jwt === undefined)
-    {
+    if (req.jwt === undefined) {
         throw new Error("Произошла попытка создания счета неавторизованным пользователем");
     }
-    
+
     const result = await DB.Bills.Insert(req.body);
 
     await DB.Bills.BillsDealers.Insert(req.jwt.id, result.id);
@@ -39,11 +45,10 @@ billsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IBill>, res
 }));
 
 billsRouter.get("/:billID", expressAsyncHandler(async (req: RequestBody, res: Response<IBill>) => {
-    if (req.jwt === undefined)
-    {
+    if (req.jwt === undefined) {
         throw new Error("Произошла попытка получения счета неавторизованным пользователем");
     }
-    
+
     const bill = await DB.Bills.SelectDealerBill(Number(req.params.billID), req.jwt.id);
 
     res.json(bill);
@@ -56,11 +61,10 @@ billsRouter.put("/:billID", expressAsyncHandler(async (req: RequestBody<IBill>, 
 }));
 
 billsRouter.delete("/:billID", expressAsyncHandler(async (req: RequestBody, res: Response) => {
-    if (req.jwt === undefined)
-    {
+    if (req.jwt === undefined) {
         throw new Error("Произошла попытка удаления счета неавторизованным пользователем");
     }
-    
+
     const billID = Number(req.params.billID);
 
     await DB.Bills.BillsDealers.Delete(billID);

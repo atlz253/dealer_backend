@@ -4,6 +4,7 @@ import Banks from "./Banks";
 import Bills from "./Bills";
 import Categories from "./Categories";
 import Clients from "./Clients";
+import Contracts from "./Contracts";
 import Dealers from "./Dealers";
 import FirstNames from "./FirstNames";
 import Manufacturers from "./Manufacturers";
@@ -48,6 +49,10 @@ class DB {
 
     public static get Dealers(): typeof Dealers {
         return Dealers;
+    }
+
+    public static get Contracts(): typeof Contracts {
+        return Contracts;
     }
 }
 

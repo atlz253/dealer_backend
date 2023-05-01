@@ -7,6 +7,7 @@ import DB from "./DB";
 import Logger from "../logger";
 import BillsDealers from "./BillsDealers";
 import BillsClients from "./BillsClients";
+import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
 
 class Bills {
     public static get BillsDealers(): typeof BillsDealers {
@@ -117,6 +118,31 @@ class Bills {
         return result.rows;
     }
 
+    public static async SelectBillsNumbersByDealerID(dealerID: number): Promise<IBillNumber[]> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    bills.bill_id AS id,
+                    bills.bill_number AS "billNumber"
+                FROM
+                    bills,
+                    dealers,
+                    bills_dealers
+                WHERE
+                    dealers.dealer_id = $1 AND
+                    bills_dealers.dealers_dealer_id = $1 AND
+                    bills_dealers.bills_bill_id = bills.bill_id
+            `,
+            values: [
+                dealerID
+            ]
+        };
+    
+        const result = await pool.query<IBillNumber>(query);
+    
+        return result.rows;
+    }
+
     public static async SelectByClientID(clientID: number): Promise<IBaseBill[]> {
         const query: QueryConfig = {
             text: `
@@ -145,6 +171,31 @@ class Bills {
         };
     
         const result = await pool.query<IBaseBill>(query);
+    
+        return result.rows;
+    }
+
+    public static async SelectBillsNumbersByClientID(clientID: number): Promise<IBillNumber[]> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    bills.bill_id AS id,
+                    bills.bill_number AS "billNumber"
+                FROM
+                    bills,
+                    clients,
+                    bills_clients
+                WHERE
+                    clients.client_id = $1 AND
+                    bills_clients.clients_client_id = $1 AND
+                    bills_clients.bills_bill_id = bills.bill_id
+            `,
+            values: [
+                clientID
+            ]
+        };
+    
+        const result = await pool.query<IBillNumber>(query);
     
         return result.rows;
     }

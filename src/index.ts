@@ -1,6 +1,6 @@
 import express, { Express, NextFunction, Request, Response } from "express";
 import cors from "cors";
-import contractsRouter from "./contracts";
+import contractsRouter from "./routers/contractsRouter";
 import productsRouter from "./routers/productsRouter";
 import bodyParser from "body-parser";
 import { port } from "./config";

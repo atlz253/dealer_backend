@@ -8,6 +8,8 @@ import dealerAuthCheck from "../../middleware/dealerAuthCheck";
 import IClient from "audio_diler_common/interfaces/IClient";
 import ID from "audio_diler_common/interfaces/ID";
 import billsRouter from "./billsRouter";
+import Logger from "../../logger";
+import IName from "audio_diler_common/interfaces/IName";
 
 const clientsRouter = express.Router();
 
@@ -16,10 +18,19 @@ clientsRouter.use(dealerAuthCheck);
 
 clientsRouter.use("/:clientID/bills", billsRouter)
 
-clientsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseClient[]>) => {
-    const clients = await DB.Clients.SelectAll();
+clientsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseClient[] | IName[]>) => {
+    Logger.debug(req.query.onlyNames === undefined);
 
-    res.json(clients);
+    if (req.query.onlyNames) {
+        const names = await DB.Clients.SelectNames();
+
+        res.json(names);
+    }
+    else {
+        const clients = await DB.Clients.SelectAll();
+
+        res.json(clients);
+    }
 }));
 
 clientsRouter.get("/:clientID", expressAsyncHandler(async (req: RequestBody, res: Response<IClient>) => {
@@ -44,7 +55,7 @@ clientsRouter.put("/:clientID", expressAsyncHandler(async (req: RequestBody<ICli
 
 clientsRouter.delete("/:clientID", expressAsyncHandler(async (req: RequestBody, res: Response) => {
     const clientID = Number(req.params.clientID);
-    
+
     await DB.Clients.Delete(clientID);
 
     res.sendStatus(200);

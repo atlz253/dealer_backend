@@ -4,6 +4,7 @@ import IBaseClient from "audio_diler_common/interfaces/IBaseClient";
 import IClient from "audio_diler_common/interfaces/IClient";
 import ID from "audio_diler_common/interfaces/ID";
 import DB from "./DB";
+import IName from "audio_diler_common/interfaces/IName";
 
 class Clients {
     public static async SelectAll(): Promise<IBaseClient[]> {
@@ -53,6 +54,25 @@ class Clients {
         const result = await pool.query<IClient>(query);
     
         return result.rows[0];
+    }
+
+    public static async SelectNames(): Promise<IName[]> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    clients.client_id AS id,
+                    first_names.first_name AS "name"
+                FROM
+                    clients,
+                    first_names
+                WHERE
+                    clients.first_name_id = first_names.first_name_id
+            `
+        };
+    
+        const result = await pool.query<IName>(query);
+    
+        return result.rows;
     }
 
     public static async Insert(client: IClient): Promise<ID> {
