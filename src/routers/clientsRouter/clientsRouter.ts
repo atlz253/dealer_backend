@@ -19,8 +19,6 @@ clientsRouter.use(dealerAuthCheck);
 clientsRouter.use("/:clientID/bills", billsRouter)
 
 clientsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<IBaseClient[] | IName[]>) => {
-    Logger.debug(req.query.onlyNames === undefined);
-
     if (req.query.onlyNames) {
         const names = await DB.Clients.SelectNames();
 
