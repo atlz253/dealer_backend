@@ -21,12 +21,12 @@ billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<
     }
 
     if (req.query.onlyBillNumbers) {
-        const billsNumbers = await DB.Bills.SelectBillsNumbersByDealerID(req.jwt.id);
+        const billsNumbers = await DB.Dealers.Bills.SelectBillsNumbers(req.jwt.id);
 
         res.json(billsNumbers);
     }
     else {
-        const bills = await DB.Bills.SelectByDealerID(req.jwt.id);
+        const bills = await DB.Dealers.Bills.SelectAll(req.jwt.id);
 
         res.json(bills);
     }
@@ -37,9 +37,7 @@ billsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IBill>, res
         throw new Error("Произошла попытка создания счета неавторизованным пользователем");
     }
 
-    const result = await DB.Bills.Insert(req.body);
-
-    await DB.Bills.BillsDealers.Insert(req.jwt.id, result.id);
+    const result = await DB.Dealers.Bills.Insert(req.body, req.jwt.id);
 
     res.json(result);
 }));
@@ -49,13 +47,13 @@ billsRouter.get("/:billID", expressAsyncHandler(async (req: RequestBody, res: Re
         throw new Error("Произошла попытка получения счета неавторизованным пользователем");
     }
 
-    const bill = await DB.Bills.SelectDealerBill(Number(req.params.billID), req.jwt.id);
+    const bill = await DB.Dealers.Bills.Select(Number(req.params.billID), req.jwt.id);
 
     res.json(bill);
 }));
 
 billsRouter.put("/:billID", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response) => {
-    await DB.Bills.Update(req.body);
+    await DB.Dealers.Bills.Update(req.body);
 
     res.sendStatus(200);
 }));
@@ -67,9 +65,7 @@ billsRouter.delete("/:billID", expressAsyncHandler(async (req: RequestBody, res:
 
     const billID = Number(req.params.billID);
 
-    await DB.Bills.BillsDealers.Delete(billID);
-
-    await DB.Bills.Delete(billID);
+    await DB.Dealers.Bills.Delete(billID);
 
     res.sendStatus(200);
 }));

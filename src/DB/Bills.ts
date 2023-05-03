@@ -10,197 +10,7 @@ import BillsClients from "./BillsClients";
 import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
 
 class Bills {
-    public static get BillsDealers(): typeof BillsDealers {
-        return BillsDealers;
-    }
-
-    public static get BillsClients(): typeof BillsClients {
-        return BillsClients;
-    }
-
-    public static async SelectDealerBill(billID: number, dealerID: number): Promise<IBill> {
-        const query: QueryConfig = {
-            text: `
-                SELECT
-                    bills.bill_id AS id,
-                    bills.bill_number AS "billNumber",
-                    banks.name AS "bankName",
-                    bills.expires AS "expireDate",
-                    bills.correspondent_bill AS "correspondentBill",
-                    bills.bic AS "BIC",
-                    bills.inn AS "INN",
-                    first_names.first_name AS "ownerName"
-                FROM
-                    bills,
-                    banks,
-                    dealers,
-                    first_names
-                WHERE
-                    bills.bill_id = $1 AND
-                    dealers.dealer_id = $2 AND
-                    bills.bank_id = banks.bank_id AND
-                    dealers.first_name_id = first_names.first_name_id
-            `,
-            values: [
-                billID,
-                dealerID
-            ]
-        };
-    
-        const result = await pool.query<IBill>(query);
-    
-        return result.rows[0];
-    }
-
-    public static async SelectClientBill(billID: number, clientID: number): Promise<IBill> {
-        const query: QueryConfig = {
-            text: `
-                SELECT
-                    bills.bill_id AS id,
-                    bills.bill_number AS "billNumber",
-                    banks.name AS "bankName",
-                    bills.expires AS "expireDate",
-                    bills.correspondent_bill AS "correspondentBill",
-                    bills.bic AS "BIC",
-                    bills.inn AS "INN",
-                    first_names.first_name AS "ownerName"
-                FROM
-                    bills,
-                    banks,
-                    clients,
-                    first_names
-                WHERE
-                    bills.bill_id = $1 AND
-                    clients.client_id = $2 AND
-                    bills.bank_id = banks.bank_id AND
-                    clients.first_name_id = first_names.first_name_id
-            `,
-            values: [
-                billID,
-                clientID
-            ]
-        };
-    
-        const result = await pool.query<IBill>(query);
-
-        return result.rows[0];
-    }
-
-    public static async SelectByDealerID(dealerID: number): Promise<IBaseBill[]> {
-        const query: QueryConfig = {
-            text: `
-                SELECT
-                    bills.bill_id AS id,
-                    bills.bill_number AS "billNumber",
-                    banks.name AS "bankName",
-                    bills.expires AS "expireDate",
-                    first_names.first_name AS "ownerName"
-                FROM
-                    bills,
-                    banks,
-                    dealers,
-                    first_names,
-                    bills_dealers
-                WHERE
-                    dealers.dealer_id = $1 AND
-                    bills.bank_id = banks.bank_id AND
-                    bills_dealers.dealers_dealer_id = $1 AND
-                    bills_dealers.bills_bill_id = bills.bill_id AND
-                    dealers.first_name_id = first_names.first_name_id
-            `,
-            values: [
-                dealerID
-            ]
-        };
-    
-        const result = await pool.query<IBaseBill>(query);
-    
-        return result.rows;
-    }
-
-    public static async SelectBillsNumbersByDealerID(dealerID: number): Promise<IBillNumber[]> {
-        const query: QueryConfig = {
-            text: `
-                SELECT
-                    bills.bill_id AS id,
-                    bills.bill_number AS "billNumber"
-                FROM
-                    bills,
-                    dealers,
-                    bills_dealers
-                WHERE
-                    dealers.dealer_id = $1 AND
-                    bills_dealers.dealers_dealer_id = $1 AND
-                    bills_dealers.bills_bill_id = bills.bill_id
-            `,
-            values: [
-                dealerID
-            ]
-        };
-    
-        const result = await pool.query<IBillNumber>(query);
-    
-        return result.rows;
-    }
-
-    public static async SelectByClientID(clientID: number): Promise<IBaseBill[]> {
-        const query: QueryConfig = {
-            text: `
-                SELECT
-                    bills.bill_id AS id,
-                    bills.bill_number AS "billNumber",
-                    banks.name AS "bankName",
-                    bills.expires AS "expireDate",
-                    first_names.first_name AS "ownerName"
-                FROM
-                    bills,
-                    banks,
-                    clients,
-                    first_names,
-                    bills_clients
-                WHERE
-                    clients.client_id = $1 AND
-                    bills.bank_id = banks.bank_id AND
-                    bills_clients.clients_client_id = $1 AND
-                    bills_clients.bills_bill_id = bills.bill_id AND
-                    clients.first_name_id = first_names.first_name_id
-            `,
-            values: [
-                clientID
-            ]
-        };
-    
-        const result = await pool.query<IBaseBill>(query);
-    
-        return result.rows;
-    }
-
-    public static async SelectBillsNumbersByClientID(clientID: number): Promise<IBillNumber[]> {
-        const query: QueryConfig = {
-            text: `
-                SELECT
-                    bills.bill_id AS id,
-                    bills.bill_number AS "billNumber"
-                FROM
-                    bills,
-                    clients,
-                    bills_clients
-                WHERE
-                    clients.client_id = $1 AND
-                    bills_clients.clients_client_id = $1 AND
-                    bills_clients.bills_bill_id = bills.bill_id
-            `,
-            values: [
-                clientID
-            ]
-        };
-    
-        const result = await pool.query<IBillNumber>(query);
-    
-        return result.rows;
-    }
-
-    public static async Insert(bill: IBill): Promise<ID> {
+    protected static async Insert(bill: IBill): Promise<ID> {
         const bankID = await DB.Banks.GetIDByName(bill.bankName);
 
         const query: QueryConfig = {
@@ -265,7 +75,7 @@ class Bills {
         await pool.query(query);
     }
 
-    public static async Delete(id: number): Promise<void> {
+    protected static async Delete(billID: number): Promise<void> {
         const query: QueryConfig = {
             text: `
                 DELETE FROM
@@ -274,7 +84,7 @@ class Bills {
                     bill_id = $1
             `,
             values: [
-                id
+                billID
             ]
         };
     

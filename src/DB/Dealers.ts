@@ -4,8 +4,13 @@ import IDealer from "audio_diler_common/interfaces/IDealer";
 import ID from "audio_diler_common/interfaces/ID";
 import IAuthorization from "audio_diler_common/interfaces/IAuthorization";
 import DB from "./DB";
+import BillsDealers from "./BillsDealers";
 
 class Dealers {
+    public static get Bills(): typeof BillsDealers {
+        return BillsDealers;
+    }
+
     public static async Insert(dealer: IDealer): Promise<number> {
         const nameID = await DB.FirstNames.SelectIDByName(dealer.firstName);
 

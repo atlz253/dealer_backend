@@ -17,30 +17,58 @@ class Contracts {
             text: `
                 SELECT
                     contracts.contract_id AS id,
-                    (
-                        SELECT
-                            first_names.first_name as "sellerName"
-                        FROM
-                            dealers,
-                            first_names,
-                            bills_dealers
-                        WHERE
-                            bills_dealers.bills_bill_id = contracts.seller_bill_id AND
-                            bills_dealers.dealers_dealer_id = dealers.dealer_id AND
-                            first_names.first_name_id = dealers.first_name_id
-                    ),
-                    (
-                        SELECT
-                            first_names.first_name as "buyerName"
-                        FROM
-                            clients,
-                            first_names,
-                            bills_clients
-                        WHERE
-                            bills_clients.bills_bill_id = contracts.buyer_bill_id AND
-                            bills_clients.clients_client_id = clients.client_id AND
-                            first_names.first_name_id = clients.first_name_id
-                    ),
+                    concat (
+                        (
+                            SELECT
+                                company_names.company_name
+                            FROM
+                                providers,
+                                company_names,
+                                bills_providers
+                            WHERE
+                                bills_providers.bills_bill_id = contracts.seller_bill_id AND
+                                bills_providers.providers_provider_id = providers.provider_id AND
+                                company_names.company_name_id = providers.company_name_id
+                        ),
+                        (
+                            SELECT
+                                first_names.first_name
+                            FROM
+                                dealers,
+                                first_names,
+                                bills_dealers
+                            WHERE
+                                bills_dealers.bills_bill_id = contracts.seller_bill_id AND
+                                bills_dealers.dealers_dealer_id = dealers.dealer_id AND
+                                first_names.first_name_id = dealers.first_name_id
+                        )
+                    ) AS "sellerName",
+                    concat (
+                        (
+                            SELECT
+                                first_names.first_name
+                            FROM
+                                dealers,
+                                first_names,
+                                bills_dealers
+                            WHERE
+                                bills_dealers.bills_bill_id = contracts.buyer_bill_id AND
+                                bills_dealers.dealers_dealer_id = dealers.dealer_id AND
+                                first_names.first_name_id = dealers.first_name_id
+                        ),
+                        (
+                            SELECT
+                                first_names.first_name
+                            FROM
+                                clients,
+                                first_names,
+                                bills_clients
+                            WHERE
+                                bills_clients.bills_bill_id = contracts.buyer_bill_id AND
+                                bills_clients.clients_client_id = clients.client_id AND
+                                first_names.first_name_id = clients.first_name_id
+                        )
+                    ) AS "buyerName",
                     (
                         SELECT
                             SUM(products.price) AS price
@@ -74,56 +102,110 @@ class Contracts {
                 SELECT
                     contracts.contract_id AS id,
                     contracts.created,
-                    (
-                        SELECT
-                            json_build_object(
-                                'id', bills.bill_id,
-                                'billNumber', bills.bill_number,
-                                'bankName', banks.name,
-                                'expireDate', bills.expires,
-                                'correspondentBill', bills.correspondent_bill,
-                                'BIC', bills.bic,
-                                'INN', bills.inn,
-                                'ownerName', first_names.first_name 
-                            )
-                        FROM
-                            bills,
-                            banks,
-                            dealers,
-                            first_names,
-                            bills_dealers
-                        WHERE
-                            bills.bill_id = contracts.seller_bill_id AND
-                            bills.bill_id = bills_dealers.bills_bill_id AND
-                            dealers.dealer_id = bills_dealers.dealers_dealer_id AND
-                            bills.bank_id = banks.bank_id AND
-                            dealers.first_name_id = first_names.first_name_id
-                    ) AS "sellerBill",
-                    (
-                        SELECT
-                            json_build_object(
-                                'id', bills.bill_id,
-                                'billNumber', bills.bill_number,
-                                'bankName', banks.name,
-                                'expireDate', bills.expires,
-                                'correspondentBill', bills.correspondent_bill,
-                                'BIC', bills.bic,
-                                'INN', bills.inn,
-                                'ownerName', first_names.first_name 
-                            )
-                        FROM
-                            bills,
-                            banks,
-                            clients,
-                            first_names,
-                            bills_clients
-                        WHERE
-                            bills.bill_id = contracts.buyer_bill_id AND
-                            bills.bill_id = bills_clients.bills_bill_id AND
-                            clients.client_id = bills_clients.clients_client_id AND
-                            bills.bank_id = banks.bank_id AND
-                            clients.first_name_id = first_names.first_name_id
-                    ) AS "buyerBill",
+                    concat (
+                        (
+                            SELECT
+                                json_build_object(
+                                    'id', bills.bill_id,
+                                    'billNumber', bills.bill_number,
+                                    'bankName', banks.name,
+                                    'expireDate', bills.expires,
+                                    'correspondentBill', bills.correspondent_bill,
+                                    'BIC', bills.bic,
+                                    'INN', bills.inn,
+                                    'ownerName', first_names.first_name
+                                )::text
+                            FROM
+                                bills,
+                                banks,
+                                dealers,
+                                first_names,
+                                bills_dealers
+                            WHERE
+                                bills.bill_id = contracts.seller_bill_id AND
+                                bills.bill_id = bills_dealers.bills_bill_id AND
+                                dealers.dealer_id = bills_dealers.dealers_dealer_id AND
+                                bills.bank_id = banks.bank_id AND
+                                dealers.first_name_id = first_names.first_name_id
+                        ),
+                        (
+                            SELECT
+                                json_build_object(
+                                    'id', bills.bill_id,
+                                    'billNumber', bills.bill_number,
+                                    'bankName', banks.name,
+                                    'expireDate', bills.expires,
+                                    'correspondentBill', bills.correspondent_bill,
+                                    'BIC', bills.bic,
+                                    'INN', bills.inn,
+                                    'ownerName', company_names.company_name 
+                                )::text
+                            FROM
+                                bills,
+                                banks,
+                                providers,
+                                company_names,
+                                bills_providers
+                            WHERE
+                                bills.bill_id = contracts.seller_bill_id AND
+                                bills.bill_id = bills_providers.bills_bill_id AND
+                                providers.provider_id = bills_providers.providers_provider_id AND
+                                bills.bank_id = banks.bank_id AND
+                                providers.company_name_id = company_names.company_name_id
+                        )
+                    )::json AS "sellerBill",
+                    concat (
+                        (
+                            SELECT
+                                json_build_object(
+                                    'id', bills.bill_id,
+                                    'billNumber', bills.bill_number,
+                                    'bankName', banks.name,
+                                    'expireDate', bills.expires,
+                                    'correspondentBill', bills.correspondent_bill,
+                                    'BIC', bills.bic,
+                                    'INN', bills.inn,
+                                    'ownerName', first_names.first_name 
+                                )
+                            FROM
+                                bills,
+                                banks,
+                                clients,
+                                first_names,
+                                bills_clients
+                            WHERE
+                                bills.bill_id = contracts.buyer_bill_id AND
+                                bills.bill_id = bills_clients.bills_bill_id AND
+                                clients.client_id = bills_clients.clients_client_id AND
+                                bills.bank_id = banks.bank_id AND
+                                clients.first_name_id = first_names.first_name_id
+                        ),
+                        (
+                            SELECT
+                                json_build_object(
+                                    'id', bills.bill_id,
+                                    'billNumber', bills.bill_number,
+                                    'bankName', banks.name,
+                                    'expireDate', bills.expires,
+                                    'correspondentBill', bills.correspondent_bill,
+                                    'BIC', bills.bic,
+                                    'INN', bills.inn,
+                                    'ownerName', first_names.first_name 
+                                )
+                            FROM
+                                bills,
+                                banks,
+                                dealers,
+                                first_names,
+                                bills_dealers
+                            WHERE
+                                bills.bill_id = contracts.buyer_bill_id AND
+                                bills.bill_id = bills_dealers.bills_bill_id AND
+                                dealers.dealer_id = bills_dealers.dealers_dealer_id AND
+                                bills.bank_id = banks.bank_id AND
+                                dealers.first_name_id = first_names.first_name_id
+                        )
+                    )::json AS "buyerBill",
                     ARRAY(
                         SELECT
                             json_build_object(

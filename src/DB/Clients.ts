@@ -5,8 +5,13 @@ import IClient from "audio_diler_common/interfaces/IClient";
 import ID from "audio_diler_common/interfaces/ID";
 import DB from "./DB";
 import IName from "audio_diler_common/interfaces/IName";
+import BillsClients from "./BillsClients";
 
 class Clients {
+    public static get Bills(): typeof BillsClients {
+        return BillsClients;
+    }
+
     public static async SelectAll(): Promise<IBaseClient[]> {
         const query: QueryConfig = {
             text: `

@@ -8,8 +8,6 @@ import IResponse from "audio_diler_common/interfaces/IResponse";
 import DBMoneyConverter from "../utils/DBMoneyConverter";
 
 class Products {
-    
-
     public static async Insert(product: IProduct): Promise<ID> {
         const categoryID = await DB.Categories.GetIDByName(product.category);
         const manufacturerID = await DB.Manufacturers.GetIDByName(product.manufacturer);

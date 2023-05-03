@@ -15,12 +15,12 @@ billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<
     const clientID = Number(req.params.clientID);
 
     if (req.query.onlyBillNumbers) {
-        const billsNumbers = await DB.Bills.SelectBillsNumbersByClientID(clientID);
+        const billsNumbers = await DB.Clients.Bills.SelectBillsNumbers(clientID);
 
         res.json(billsNumbers);
     }
     else {
-        const bills = await DB.Bills.SelectByClientID(clientID);
+        const bills = await DB.Clients.Bills.Select(clientID);
 
         res.json(bills);
     }
@@ -28,10 +28,8 @@ billsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Response<
 
 billsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response<ID>) => {
     const clientID = Number(req.params.clientID);
-    
-    const billID = await DB.Bills.Insert(req.body);
 
-    await DB.Bills.BillsClients.Insert(clientID, billID.id);
+    const billID = await DB.Clients.Bills.Insert(req.body, clientID);
 
     res.json(billID);
 }));
@@ -40,7 +38,7 @@ billsRouter.get("/:billID", expressAsyncHandler(async (req: RequestBody, res: Re
     const billID = Number(req.params.billID);
     const clientID = Number(req.params.clientID);
     
-    const bill = await DB.Bills.SelectClientBill(billID, clientID);
+    const bill = await DB.Clients.Bills.SelectAll(billID, clientID);
     
     res.json(bill);
 }));
@@ -49,15 +47,13 @@ billsRouter.delete("/:billID", expressAsyncHandler(async (req: RequestBody, res:
     const billID = Number(req.params.billID);
     const clientID = Number(req.params.clientID);
 
-    await DB.Bills.BillsClients.Delete(clientID);
-
-    await DB.Bills.Delete(billID);
+    await DB.Clients.Bills.Delete(billID); // FIXME: проверка, что удаляется точно счёт клиента
 
     res.sendStatus(200);
 }));
 
 billsRouter.put("/:billID", expressAsyncHandler(async (req: RequestBody<IBill>, res: Response) => {
-    await DB.Bills.Update(req.body);
+    await DB.Clients.Bills.Update(req.body);
     
     res.sendStatus(200);
 }));

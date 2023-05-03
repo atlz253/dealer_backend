@@ -4,11 +4,13 @@ import Banks from "./Banks";
 import Bills from "./Bills";
 import Categories from "./Categories";
 import Clients from "./Clients";
+import CompanyNames from "./CompanyNames";
 import Contracts from "./Contracts";
 import Dealers from "./Dealers";
 import FirstNames from "./FirstNames";
 import Manufacturers from "./Manufacturers";
 import Products from "./Products";
+import Providers from "./Providers";
 
 class DB {
     public static get Categories(): typeof Categories {
@@ -21,10 +23,6 @@ class DB {
 
     public static get Manufacturers(): typeof Manufacturers {
         return Manufacturers;
-    }
-
-    public static get Bills(): typeof Bills {
-        return Bills;
     }
 
     public static get Banks(): typeof Banks {
@@ -53,6 +51,14 @@ class DB {
 
     public static get Contracts(): typeof Contracts {
         return Contracts;
+    }
+
+    public static get Providers(): typeof Providers {
+        return Providers;
+    }
+
+    public static get CompanyNames(): typeof CompanyNames {
+        return CompanyNames;
     }
 }
 

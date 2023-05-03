@@ -1,13 +1,14 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import IBaseBill from "audio_diler_common/interfaces/IBaseBill";
-import IBill from "audio_diler_common/interfaces/IBill";
-import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
 import Bills from "./Bills";
 import ID from "audio_diler_common/interfaces/ID";
+import IBill from "audio_diler_common/interfaces/IBill";
+import IBaseBill from "audio_diler_common/interfaces/IBaseBill";
+import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
 
-class BillsClients extends Bills {
-    public static async SelectAll(billID: number, clientID: number): Promise<IBill> {
+// TODO: Удаление и вставку счетов можно переписать в 1 SQL запрос
+class BillsProvider extends Bills {
+    public static async Select(billID: number, providerID: number): Promise<IBill> {
         const query: QueryConfig = {
             text: `
                 SELECT
@@ -18,21 +19,21 @@ class BillsClients extends Bills {
                     bills.correspondent_bill AS "correspondentBill",
                     bills.bic AS "BIC",
                     bills.inn AS "INN",
-                    first_names.first_name AS "ownerName"
+                    company_names.company_name AS "ownerName"
                 FROM
                     bills,
                     banks,
-                    clients,
-                    first_names
+                    providers,
+                    company_names
                 WHERE
                     bills.bill_id = $1 AND
-                    clients.client_id = $2 AND
+                    providers.provider_id = $2 AND
                     bills.bank_id = banks.bank_id AND
-                    clients.first_name_id = first_names.first_name_id
+                    providers.company_name_id = company_names.company_name_id
             `,
             values: [
                 billID,
-                clientID
+                providerID
             ]
         };
     
@@ -41,7 +42,7 @@ class BillsClients extends Bills {
         return result.rows[0];
     }
 
-    public static async Select(clientID: number): Promise<IBaseBill[]> {
+    public static async SelectAll(providerID: number): Promise<IBaseBill[]> {
         const query: QueryConfig = {
             text: `
                 SELECT
@@ -49,22 +50,22 @@ class BillsClients extends Bills {
                     bills.bill_number AS "billNumber",
                     banks.name AS "bankName",
                     bills.expires AS "expireDate",
-                    first_names.first_name AS "ownerName"
+                    company_names.company_name AS "ownerName"
                 FROM
                     bills,
                     banks,
-                    clients,
-                    first_names,
-                    bills_clients
+                    providers,
+                    company_names,
+                    bills_providers
                 WHERE
-                    clients.client_id = $1 AND
+                    providers.provider_id = $1 AND
                     bills.bank_id = banks.bank_id AND
-                    bills_clients.clients_client_id = $1 AND
-                    bills_clients.bills_bill_id = bills.bill_id AND
-                    clients.first_name_id = first_names.first_name_id
+                    bills_providers.providers_provider_id = $1 AND
+                    bills_providers.bills_bill_id = bills.bill_id AND
+                    providers.company_name_id = company_names.company_name_id
             `,
             values: [
-                clientID
+                providerID
             ]
         };
     
@@ -73,7 +74,7 @@ class BillsClients extends Bills {
         return result.rows;
     }
 
-    public static async SelectBillsNumbers(clientID: number): Promise<IBillNumber[]> {
+    public static async SelectBillsNumbers(providerID: number): Promise<IBillNumber[]> {
         const query: QueryConfig = {
             text: `
                 SELECT
@@ -81,15 +82,15 @@ class BillsClients extends Bills {
                     bills.bill_number AS "billNumber"
                 FROM
                     bills,
-                    clients,
-                    bills_clients
+                    providers,
+                    bills_providers
                 WHERE
-                    clients.client_id = $1 AND
-                    bills_clients.clients_client_id = $1 AND
-                    bills_clients.bills_bill_id = bills.bill_id
+                    providers.provider_id = $1 AND
+                    bills_providers.providers_provider_id = $1 AND
+                    bills_providers.bills_bill_id = bills.bill_id
             `,
             values: [
-                clientID
+                providerID
             ]
         };
     
@@ -98,22 +99,22 @@ class BillsClients extends Bills {
         return result.rows;
     }
 
-    public static async Insert(bill: IBill, clientID?: number): Promise<ID> {
+    public static async Insert(bill: IBill, providerID?: number): Promise<ID> {
         const billID = await super.Insert(bill);
-        
+
         const query: QueryConfig = {
             text: `
                 INSERT INTO
-                    bills_clients (
+                    bills_providers (
                         bills_bill_id,
-                        clients_client_id
+                        providers_provider_id
                     )
                 VALUES
                     ($1, $2)
             `,
             values: [
                 billID.id,
-                clientID
+                providerID
             ]
         };
     
@@ -128,7 +129,7 @@ class BillsClients extends Bills {
         const query: QueryConfig = {
             text: `
                 DELETE FROM
-                    bills_clients
+                    bills_providers
                 WHERE
                     bills_bill_id = $1
             `,
@@ -141,4 +142,4 @@ class BillsClients extends Bills {
     }
 }
 
-export default BillsClients;
+export default BillsProvider;
