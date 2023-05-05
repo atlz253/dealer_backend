@@ -59,7 +59,7 @@ usersRouter.get("/:userID", expressAsyncHandler(async (req: RequestBody, res: Re
         }
     }
 
-    res.send(user);
+    res.send({ ...user, id }); // Меняем id на authorization_id
 }));
 
 usersRouter.put("/:userID", expressAsyncHandler(async (req: RequestBody<IUser>, res: Response, next: NextFunction) => {
@@ -81,7 +81,7 @@ usersRouter.put("/:userID", expressAsyncHandler(async (req: RequestBody<IUser>, 
 
 usersRouter.delete("/:userID", expressAsyncHandler(async (req: RequestBody, res: Response, next: NextFunction) => {
     const id = Number(req.params.userID);
-    
+
     if (id === 1) {
         throw new Error("Первого администратора удалять запрещено");
     }
