@@ -72,7 +72,7 @@ class Dealers {
         const query: QueryConfig = {
             text: `
                 SELECT
-                    dealers.authorization_id AS id,
+                    dealers.dealer_id AS id,
                     dealers.employment_date AS "employmentDate",
                     first_names.first_name AS "firstName",
                     authorizations.login,
