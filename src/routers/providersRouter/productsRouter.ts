@@ -4,6 +4,7 @@ import expressAsyncHandler from "express-async-handler";
 import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
 import DB from "../../DB/DB";
 import Logger from "../../logger";
+import IDeliveryDays from "audio_diler_common/interfaces/IDeliveryDays";
 
 const productsRouter = express.Router({ 
     mergeParams: true 
@@ -17,12 +18,12 @@ productsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Respon
     res.json(products);
 }));
 
-productsRouter.put("/:productID", expressAsyncHandler(async (req: RequestBody, res: Response) => {
+productsRouter.put("/:productID", expressAsyncHandler(async (req: RequestBody<IDeliveryDays>, res: Response) => {
     const productID = Number(req.params.productID);
     const providerID = Number(req.params.providerID);
     
 
-    await DB.Providers.Products.Insert(providerID, productID);
+    await DB.Providers.Products.Insert(providerID, productID, req.body.deliveryDays);
 
     res.sendStatus(200);
 }));

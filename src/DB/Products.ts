@@ -4,8 +4,8 @@ import pool from "./pool";
 import ID from "audio_diler_common/interfaces/ID";
 import DB from "./DB";
 import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
-import IResponse from "audio_diler_common/interfaces/IResponse";
 import DBMoneyConverter from "../utils/DBMoneyConverter";
+import format from "pg-format";
 
 class Products {
     public static async Insert(product: IProduct): Promise<ID> {
@@ -131,6 +131,28 @@ class Products {
             ]
         }
 
+        await pool.query(query);
+    }
+
+    public static async UpdateQuantityByChequeID(chequeID: number, operation: string): Promise<void> {
+        const query = format(
+            `
+                UPDATE
+                    products
+                SET
+                    quantity = products.quantity %s cheques_products.product_quantity
+                FROM
+                    cheques,
+                    cheques_products
+                WHERE
+                    cheques.cheque_id = %s AND
+                    cheques_products.cheques_cheque_id = cheques.cheque_id AND
+                    cheques_products.products_product_id = products.product_id
+            `,
+            operation,
+            chequeID
+        );
+    
         await pool.query(query);
     }
 

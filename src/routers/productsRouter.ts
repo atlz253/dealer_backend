@@ -3,7 +3,6 @@ import IProduct from "audio_diler_common/interfaces/IProduct";
 import express, { NextFunction, Request, Response, response } from "express";
 import dealerAuthCheck from "../middleware/dealerAuthCheck";
 import jwtCheck from "../middleware/jwtCheck";
-import IResponse from "audio_diler_common/interfaces/IResponse";
 import pool from "../DB/pool";
 import { error } from "console";
 import DB from "../DB/DB";
@@ -35,13 +34,13 @@ productsRouter.post("/new", expressAsyncHandler(async (req: RequestBody<IProduct
     res.json(id);
 }));
 
-productsRouter.put("/:productID", expressAsyncHandler(async (req: RequestBody<IProduct>, res: Response<IResponse>) => {
+productsRouter.put("/:productID", expressAsyncHandler(async (req: RequestBody<IProduct>, res: Response) => {
     await DB.Products.Update(req.body);
 
     res.sendStatus(200);
 }));
 
-productsRouter.delete("/:productID", expressAsyncHandler(async (req: RequestBody, res: Response<IResponse>) => {
+productsRouter.delete("/:productID", expressAsyncHandler(async (req: RequestBody, res: Response) => {
     await DB.Products.Delete(Number(req.params.productID));
 
     Logger.info(`${req.jwt?.login} удалил товар с ID ${req.params.productID}`);

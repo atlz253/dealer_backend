@@ -3,20 +3,17 @@ import pool from "./pool";
 import IBaseContract from "audio_diler_common/interfaces/IBaseContract";
 import IContract from "audio_diler_common/interfaces/IContract";
 import ID from "audio_diler_common/interfaces/ID";
-import ContractsProducts from "./ContractsProducts";
 import DBMoneyConverter from "../utils/DBMoneyConverter";
 import INewContract from "audio_diler_common/interfaces/INewContract";
 
 class Contracts {
-    public static get Products(): typeof ContractsProducts {
-        return ContractsProducts;
-    }
-
     public static async Select(): Promise<IBaseContract[]> {
         const query: QueryConfig = {
             text: `
                 SELECT
                     contracts.contract_id AS id,
+                    contracts.status,
+                    contracts.type,
                     concat (
                         (
                             SELECT
@@ -73,11 +70,13 @@ class Contracts {
                         SELECT
                             SUM(products.price) AS price
                         FROM
+                            cheques,
                             products,
-                            contracts_products
+                            cheques_products
                         WHERE
-                            contracts_products.contracts_contract_id = contracts.contract_id AND
-                            contracts_products.products_product_id = products.product_id
+                            cheques.contract_id = contracts.contract_id AND
+                            cheques_products.cheques_cheque_id = cheques.cheque_id AND
+                            cheques_products.products_product_id = products.product_id
                     ),
                     contracts.created
                 FROM
@@ -102,6 +101,8 @@ class Contracts {
                 SELECT
                     contracts.contract_id AS id,
                     contracts.created,
+                    contracts.status,
+                    contracts.type,
                     concat (
                         (
                             SELECT
@@ -213,26 +214,44 @@ class Contracts {
                                 'name', products.name,
                                 'category', categories.name,
                                 'price', products.price,
-                                'quantity', products.quantity
+                                'quantity', cheques_products.product_quantity,
+                                'deliveryDate', cheques.delivery_date
                             )
                         FROM
+                            cheques,
                             products,
                             categories,
-                            contracts_products
+                            cheques_products
                         WHERE
-                            contracts_products.contracts_contract_id = $1 AND
+                            cheques.contract_id = contracts.contract_id AND
+                            cheques_products.cheques_cheque_id = cheques.cheque_id AND
                             products.category_id = categories.category_id AND
-                            contracts_products.products_product_id = products.product_id
+                            cheques_products.products_product_id = products.product_id
                     ) AS products,
+                    ARRAY(
+                        SELECT
+                            json_build_object(
+                                'id', cheques.cheque_id,
+                                'deliveryDate', cheques.delivery_date,
+                                'status', cheques.status,
+                                'type', contracts.type
+                            )
+                        FROM
+                            cheques
+                        WHERE
+                            cheques.contract_id = contracts.contract_id
+                    ) as cheques,
                     (
                         SELECT
                             SUM(products.price) AS price
                         FROM
+                            cheques,
                             products,
-                            contracts_products
+                            cheques_products
                         WHERE
-                            contracts_products.contracts_contract_id = contracts.contract_id AND
-                            contracts_products.products_product_id = products.product_id
+                            cheques.contract_id = contracts.contract_id AND
+                            cheques_products.cheques_cheque_id = cheques.cheque_id AND
+                            cheques_products.products_product_id = products.product_id
                     )
                 FROM
                     contracts
@@ -266,31 +285,50 @@ class Contracts {
                     contracts (
                         created,
                         seller_bill_id,
-                        buyer_bill_id
+                        buyer_bill_id,
+                        status,
+                        type
                     )
                 VALUES
                     (
                         NOW(),
                         $1,
-                        $2
+                        $2,
+                        'open',
+                        $3
                     )
                 RETURNING
                     contract_id AS id
             `,
             values: [
                 contract.sellerBillID,
-                contract.buyerBillID
+                contract.buyerBillID,
+                contract.type
             ]
         };
     
         const result = await pool.query<ID>(query);
 
-        const contractID = result.rows[0];
-        const productIDs = contract.products.map(product => product.id);
+        return result.rows[0];
+    }
 
-        await this.Products.Insert(contractID.id, productIDs);
-
-        return contractID;
+    public static async UpdateStatus(contractID: number, status: string): Promise<void> {
+        const query: QueryConfig = {
+            text: `
+                UPDATE
+                    contracts
+                SET
+                    status = $1
+                WHERE
+                    contract_id = $2
+            `,
+            values: [
+                status,
+                contractID
+            ]
+        };
+    
+        await pool.query(query);
     }
 }
 

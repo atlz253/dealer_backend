@@ -12,7 +12,8 @@ class ProvidersProducts {
                     products.name, 
                     categories.name as category, 
                     products.price, 
-                    products.quantity
+                    products.quantity,
+                    providers_products.delivery_days AS "deliveryDays"
                 FROM 
                     products, 
                     categories,
@@ -38,20 +39,22 @@ class ProvidersProducts {
         return result.rows;
     }
 
-    public static async Insert(providerID: number, productID: number): Promise<void> {
+    public static async Insert(providerID: number, productID: number, deliveryDays: number): Promise<void> {
         const query: QueryConfig = {
             text: `
                 INSERT INTO
                     providers_products (
                         providers_provider_id,
-                        products_product_id
+                        products_product_id,
+                        delivery_days
                     )
                 VALUES
-                    ($1, $2)
+                    ($1, $2, $3)
             `,
             values: [
                 providerID,
-                productID
+                productID,
+                deliveryDays
             ]
         }
 

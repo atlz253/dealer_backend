@@ -3,6 +3,7 @@ import Authorizations from "./Authorizations";
 import Banks from "./Banks";
 import Bills from "./Bills";
 import Categories from "./Categories";
+import Cheques from "./Cheques";
 import Clients from "./Clients";
 import CompanyNames from "./CompanyNames";
 import Contracts from "./Contracts";
@@ -59,6 +60,10 @@ class DB {
 
     public static get CompanyNames(): typeof CompanyNames {
         return CompanyNames;
+    }
+
+    public static get Cheques(): typeof Cheques {
+        return Cheques;
     }
 }
 

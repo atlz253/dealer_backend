@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import IResponse from "audio_diler_common/interfaces/IResponse";
 import jwt from "jsonwebtoken";
 import { accessTokenSecret } from "../config";
 import Logger from "../logger";
