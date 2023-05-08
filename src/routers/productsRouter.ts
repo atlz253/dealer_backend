@@ -10,6 +10,7 @@ import ID from "audio_diler_common/interfaces/ID";
 import RequestBody from "../interfaces/RequestBody";
 import expressAsyncHandler from "express-async-handler";
 import Logger from "../logger";
+import ICount from "audio_diler_common/interfaces/ICount";
 
 const productsRouter = express.Router();
 
@@ -20,6 +21,12 @@ productsRouter.get('/', expressAsyncHandler(async (req: RequestBody, res: Respon
     const products = await DB.Products.SelectAll();
 
     res.json(products);
+}));
+
+productsRouter.get("/count", expressAsyncHandler(async (req: RequestBody, res: Response<ICount>) => {
+    const count = await DB.Products.SelectCount();
+
+    res.json(count);
 }));
 
 productsRouter.get('/:productID', expressAsyncHandler(async (req: RequestBody, res: Response<IProduct>) => {

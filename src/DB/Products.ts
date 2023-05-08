@@ -6,6 +6,7 @@ import DB from "./DB";
 import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
 import DBMoneyConverter from "../utils/DBMoneyConverter";
 import format from "pg-format";
+import ICount from "audio_diler_common/interfaces/ICount";
 
 class Products {
     public static async Insert(product: IProduct): Promise<ID> {
@@ -98,6 +99,21 @@ class Products {
             row.price = DBMoneyConverter.ConvertMoneyToNumber(row.price);
         }
 
+        return result.rows[0];
+    }
+
+    public static async SelectCount(): Promise<ICount> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    COUNT(*)
+                FROM
+                    products
+            `
+        };
+    
+        const result = await pool.query<ICount>(query);
+    
         return result.rows[0];
     }
 

@@ -7,6 +7,7 @@ import DB from "./DB";
 import IName from "audio_diler_common/interfaces/IName";
 import BillsProvider from "./BillsProviders";
 import ProvidersProducts from "./ProvidersProducts";
+import ICount from "audio_diler_common/interfaces/ICount";
 
 class Providers {
     public static get Bills(): typeof BillsProvider {
@@ -78,6 +79,21 @@ class Providers {
         };
     
         const result = await pool.query<IProvider>(query);
+    
+        return result.rows[0];
+    }
+
+    public static async SelectCount(): Promise<ICount> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    COUNT(*)
+                FROM
+                    providers
+            `
+        };
+    
+        const result = await pool.query<ICount>(query);
     
         return result.rows[0];
     }

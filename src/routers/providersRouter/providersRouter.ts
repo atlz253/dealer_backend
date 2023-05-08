@@ -10,6 +10,7 @@ import ID from "audio_diler_common/interfaces/ID";
 import billsRouter from "./billsRouter";
 import productsRouter from "./productsRouter";
 import IName from "audio_diler_common/interfaces/IName";
+import ICount from "audio_diler_common/interfaces/ICount";
 
 const providersRouter = express.Router();
 
@@ -31,6 +32,12 @@ providersRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Respo
 
         res.json(providers);
     }
+}));
+
+providersRouter.get("/count", expressAsyncHandler(async (req: RequestBody, res: Response<ICount>) => {
+    const count = await DB.Providers.SelectCount();
+
+    res.json(count);
 }));
 
 providersRouter.get("/:providerID", expressAsyncHandler(async (req: RequestBody, res: Response<IProvider>) => {

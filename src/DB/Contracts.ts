@@ -5,6 +5,8 @@ import IContract from "audio_diler_common/interfaces/IContract";
 import ID from "audio_diler_common/interfaces/ID";
 import DBMoneyConverter from "../utils/DBMoneyConverter";
 import INewContract from "audio_diler_common/interfaces/INewContract";
+import ICount from "audio_diler_common/interfaces/ICount";
+import format from "pg-format";
 
 class Contracts {
     public static async Select(): Promise<IBaseContract[]> {
@@ -275,6 +277,23 @@ class Contracts {
             product.price = DBMoneyConverter.ConvertMoneyToNumber(product.price);
         }
 
+        return result.rows[0];
+    }
+
+    public static async SelectCount(contractStatus?: string): Promise<ICount> {
+        const query = format(
+            `
+            SELECT
+                COUNT(*)
+            FROM
+                contracts
+                %s
+            `,
+            contractStatus ? format("WHERE status = %L", contractStatus) : ""
+        );
+    
+        const result = await pool.query<ICount>(query);
+    
         return result.rows[0];
     }
 

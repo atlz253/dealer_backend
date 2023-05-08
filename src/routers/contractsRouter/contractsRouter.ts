@@ -13,6 +13,7 @@ import ICheques from "../../interfaces/ICheques";
 import ICheque from "audio_diler_common/interfaces/ICheque";
 import { DateTime } from "luxon";
 import chequesRouter from "./chequesRouter";
+import ICount from "audio_diler_common/interfaces/ICount";
 
 const contractsRouter = express.Router();
 
@@ -25,6 +26,18 @@ contractsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Respo
     const contracts = await DB.Contracts.Select();
 
     res.json(contracts);
+}));
+
+contractsRouter.get("/count", expressAsyncHandler(async (req: RequestBody, res: Response<ICount>) => {
+    const contractStatus = req.query.contractStatus;
+
+    if (typeof contractStatus !== "string" && contractStatus !== undefined) {
+        throw new Error("Был передан некорректный параметр contractStatus");
+    }
+
+    const count = await DB.Contracts.SelectCount(contractStatus);
+
+    res.json(count);
 }));
 
 contractsRouter.get("/:contractID", expressAsyncHandler(async (req: RequestBody, res: Response<IContract>) => {
