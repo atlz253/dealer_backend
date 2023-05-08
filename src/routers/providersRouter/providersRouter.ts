@@ -3,14 +3,14 @@ import RequestBody from "../../interfaces/RequestBody";
 import expressAsyncHandler from "express-async-handler";
 import jwtCheck from "../../middleware/jwtCheck";
 import dealerAuthCheck from "../../middleware/dealerAuthCheck";
-import IBaseProvider from "audio_diler_common/interfaces/IBaseProvider";
+import IBaseProvider from "dealer_common/interfaces/IBaseProvider";
 import DB from "../../DB/DB";
-import IProvider from "audio_diler_common/interfaces/IProvider";
-import ID from "audio_diler_common/interfaces/ID";
+import IProvider from "dealer_common/interfaces/IProvider";
+import ID from "dealer_common/interfaces/ID";
 import billsRouter from "./billsRouter";
 import productsRouter from "./productsRouter";
-import IName from "audio_diler_common/interfaces/IName";
-import ICount from "audio_diler_common/interfaces/ICount";
+import IName from "dealer_common/interfaces/IName";
+import ICount from "dealer_common/interfaces/ICount";
 
 const providersRouter = express.Router();
 

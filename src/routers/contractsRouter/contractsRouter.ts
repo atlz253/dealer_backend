@@ -1,19 +1,18 @@
 import express, { Request, Response } from "express";
-import IBaseContract from "audio_diler_common/interfaces/IBaseContract";
-import IContract from "audio_diler_common/interfaces/IContract";
+import IBaseContract from "dealer_common/interfaces/IBaseContract";
+import IContract from "dealer_common/interfaces/IContract";
 import dealerAuthCheck from "../../middleware/dealerAuthCheck";
 import jwtCheck from "../../middleware/jwtCheck";
 import expressAsyncHandler from "express-async-handler";
 import RequestBody from "../../interfaces/RequestBody";
 import DB from "../../DB/DB";
 import Logger from "../../logger";
-import INewContract from "audio_diler_common/interfaces/INewContract";
-import ID from "audio_diler_common/interfaces/ID";
+import INewContract from "dealer_common/interfaces/INewContract";
+import ID from "dealer_common/interfaces/ID";
 import ICheques from "../../interfaces/ICheques";
-import ICheque from "audio_diler_common/interfaces/ICheque";
 import { DateTime } from "luxon";
 import chequesRouter from "./chequesRouter";
-import ICount from "audio_diler_common/interfaces/ICount";
+import ICount from "dealer_common/interfaces/ICount";
 
 const contractsRouter = express.Router();
 

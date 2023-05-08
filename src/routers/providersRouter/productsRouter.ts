@@ -1,10 +1,10 @@
 import express, { Response } from "express";
 import RequestBody from "../../interfaces/RequestBody";
 import expressAsyncHandler from "express-async-handler";
-import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
+import IBaseProduct from "dealer_common/interfaces/IBaseProduct";
 import DB from "../../DB/DB";
 import Logger from "../../logger";
-import IDeliveryDays from "audio_diler_common/interfaces/IDeliveryDays";
+import IDeliveryDays from "dealer_common/interfaces/IDeliveryDays";
 
 const productsRouter = express.Router({ 
     mergeParams: true 

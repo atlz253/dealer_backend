@@ -2,15 +2,15 @@ import express, { Response } from "express";
 import RequestBody from "../../interfaces/RequestBody";
 import expressAsyncHandler from "express-async-handler";
 import DB from "../../DB/DB";
-import IBaseClient from "audio_diler_common/interfaces/IBaseClient";
+import IBaseClient from "dealer_common/interfaces/IBaseClient";
 import jwtCheck from "../../middleware/jwtCheck";
 import dealerAuthCheck from "../../middleware/dealerAuthCheck";
-import IClient from "audio_diler_common/interfaces/IClient";
-import ID from "audio_diler_common/interfaces/ID";
+import IClient from "dealer_common/interfaces/IClient";
+import ID from "dealer_common/interfaces/ID";
 import billsRouter from "./billsRouter";
 import Logger from "../../logger";
-import IName from "audio_diler_common/interfaces/IName";
-import ICount from "audio_diler_common/interfaces/ICount";
+import IName from "dealer_common/interfaces/IName";
+import ICount from "dealer_common/interfaces/ICount";
 
 const clientsRouter = express.Router();
 

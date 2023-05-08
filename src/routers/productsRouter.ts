@@ -1,16 +1,14 @@
-import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
-import IProduct from "audio_diler_common/interfaces/IProduct";
+import IBaseProduct from "dealer_common/interfaces/IBaseProduct";
+import IProduct from "dealer_common/interfaces/IProduct";
 import express, { NextFunction, Request, Response, response } from "express";
 import dealerAuthCheck from "../middleware/dealerAuthCheck";
 import jwtCheck from "../middleware/jwtCheck";
-import pool from "../DB/pool";
-import { error } from "console";
 import DB from "../DB/DB";
-import ID from "audio_diler_common/interfaces/ID";
+import ID from "dealer_common/interfaces/ID";
 import RequestBody from "../interfaces/RequestBody";
 import expressAsyncHandler from "express-async-handler";
 import Logger from "../logger";
-import ICount from "audio_diler_common/interfaces/ICount";
+import ICount from "dealer_common/interfaces/ICount";
 
 const productsRouter = express.Router();
 

@@ -1,7 +1,7 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import ID from "audio_diler_common/interfaces/ID";
-import IAuthorization from "audio_diler_common/interfaces/IAuthorization";
+import ID from "dealer_common/interfaces/ID";
+import IAuthorization from "dealer_common/interfaces/IAuthorization";
 import Logger from "../logger";
 
 class Authorizations {

@@ -1,13 +1,13 @@
 import express, { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { accessTokenSecret } from "../config";
-import IAuth from "audio_diler_common/interfaces/IAuth";
+import IAuth from "dealer_common/interfaces/IAuth";
 import expressAsyncHandler from "express-async-handler";
 import RequestBody from "../interfaces/RequestBody";
 import DB from "../DB/DB";
 import Logger from "../logger";
-import IAuthorization from "audio_diler_common/interfaces/IAuthorization";
-import IUser from "audio_diler_common/interfaces/IUser";
+import IAuthorization from "dealer_common/interfaces/IAuthorization";
+import IUser from "dealer_common/interfaces/IUser";
 
 const loginRouter = express.Router();
 

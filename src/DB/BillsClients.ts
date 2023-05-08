@@ -1,10 +1,10 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import IBaseBill from "audio_diler_common/interfaces/IBaseBill";
-import IBill from "audio_diler_common/interfaces/IBill";
-import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
+import IBaseBill from "dealer_common/interfaces/IBaseBill";
+import IBill from "dealer_common/interfaces/IBill";
+import IBillNumber from "dealer_common/interfaces/IBillNumber";
 import Bills from "./Bills";
-import ID from "audio_diler_common/interfaces/ID";
+import ID from "dealer_common/interfaces/ID";
 
 class BillsClients extends Bills {
     public static async SelectAll(billID: number, clientID: number): Promise<IBill> {

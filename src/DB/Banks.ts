@@ -1,4 +1,4 @@
-import ID from "audio_diler_common/interfaces/ID";
+import ID from "dealer_common/interfaces/ID";
 import { QueryConfig } from "pg";
 import pool from "./pool";
 import Logger from "../logger";

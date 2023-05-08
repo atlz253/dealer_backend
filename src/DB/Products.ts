@@ -1,12 +1,12 @@
-import IProduct from "audio_diler_common/interfaces/IProduct";
+import IProduct from "dealer_common/interfaces/IProduct";
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import ID from "audio_diler_common/interfaces/ID";
+import ID from "dealer_common/interfaces/ID";
 import DB from "./DB";
-import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
+import IBaseProduct from "dealer_common/interfaces/IBaseProduct";
 import DBMoneyConverter from "../utils/DBMoneyConverter";
 import format from "pg-format";
-import ICount from "audio_diler_common/interfaces/ICount";
+import ICount from "dealer_common/interfaces/ICount";
 
 class Products {
     public static async Insert(product: IProduct): Promise<ID> {

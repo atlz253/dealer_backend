@@ -1,4 +1,4 @@
-import IContractProduct from "audio_diler_common/interfaces/IContractProduct";
+import IContractProduct from "dealer_common/interfaces/IContractProduct";
 
 interface ICheques {
     [day: number]: IContractProduct[]

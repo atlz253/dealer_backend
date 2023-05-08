@@ -1,9 +1,9 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
 import format from "pg-format";
-import ID from "audio_diler_common/interfaces/ID";
-import IQuantity from "audio_diler_common/interfaces/IQuantity";
-import IContractProduct from "audio_diler_common/interfaces/IContractProduct";
+import ID from "dealer_common/interfaces/ID";
+import IQuantity from "dealer_common/interfaces/IQuantity";
+import IContractProduct from "dealer_common/interfaces/IContractProduct";
 
 class ChequesProducts {
     public static async Insert(chequeID: number, products: IContractProduct[]): Promise<void> {

@@ -1,11 +1,11 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import IBaseContract from "audio_diler_common/interfaces/IBaseContract";
-import IContract from "audio_diler_common/interfaces/IContract";
-import ID from "audio_diler_common/interfaces/ID";
+import IBaseContract from "dealer_common/interfaces/IBaseContract";
+import IContract from "dealer_common/interfaces/IContract";
+import ID from "dealer_common/interfaces/ID";
 import DBMoneyConverter from "../utils/DBMoneyConverter";
-import INewContract from "audio_diler_common/interfaces/INewContract";
-import ICount from "audio_diler_common/interfaces/ICount";
+import INewContract from "dealer_common/interfaces/INewContract";
+import ICount from "dealer_common/interfaces/ICount";
 import format from "pg-format";
 
 class Contracts {

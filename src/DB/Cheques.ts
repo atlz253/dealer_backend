@@ -1,7 +1,7 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import ID from "audio_diler_common/interfaces/ID";
-import ICheque from "audio_diler_common/interfaces/ICheque";
+import ID from "dealer_common/interfaces/ID";
+import ICheque from "dealer_common/interfaces/ICheque";
 import ChequesProducts from "./ChequesProducts";
 import format from "pg-format";
 import Logger from "../logger";

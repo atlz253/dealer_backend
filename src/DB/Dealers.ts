@@ -1,8 +1,8 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import IDealer from "audio_diler_common/interfaces/IDealer";
-import ID from "audio_diler_common/interfaces/ID";
-import IAuthorization from "audio_diler_common/interfaces/IAuthorization";
+import IDealer from "dealer_common/interfaces/IDealer";
+import ID from "dealer_common/interfaces/ID";
+import IAuthorization from "dealer_common/interfaces/IAuthorization";
 import DB from "./DB";
 import BillsDealers from "./BillsDealers";
 

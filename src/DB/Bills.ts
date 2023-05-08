@@ -1,13 +1,13 @@
-import IBaseBill from "audio_diler_common/interfaces/IBaseBill";
+import IBaseBill from "dealer_common/interfaces/IBaseBill";
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import IBill from "audio_diler_common/interfaces/IBill";
-import ID from "audio_diler_common/interfaces/ID";
+import IBill from "dealer_common/interfaces/IBill";
+import ID from "dealer_common/interfaces/ID";
 import DB from "./DB";
 import Logger from "../logger";
 import BillsDealers from "./BillsDealers";
 import BillsClients from "./BillsClients";
-import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
+import IBillNumber from "dealer_common/interfaces/IBillNumber";
 
 class Bills {
     protected static async Insert(bill: IBill): Promise<ID> {

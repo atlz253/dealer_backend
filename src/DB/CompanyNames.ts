@@ -1,6 +1,6 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import ID from "audio_diler_common/interfaces/ID";
+import ID from "dealer_common/interfaces/ID";
 
 class CompanyNames {
     private static async Insert(name: string): Promise<ID> {

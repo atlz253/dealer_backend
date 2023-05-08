@@ -2,12 +2,12 @@ import express, { NextFunction, Response } from "express";
 import expressAsyncHandler from "express-async-handler";
 import RequestBody from "../interfaces/RequestBody";
 import DB from "../DB/DB";
-import ID from "audio_diler_common/interfaces/ID";
+import ID from "dealer_common/interfaces/ID";
 import jwtCheck from "../middleware/jwtCheck";
 import adminAuthCheck from "../middleware/adminAuthCheck";
 import Logger from "../logger";
-import IDealer from "audio_diler_common/interfaces/IDealer";
-import IUser from "audio_diler_common/interfaces/IUser";
+import IDealer from "dealer_common/interfaces/IDealer";
+import IUser from "dealer_common/interfaces/IUser";
 
 const usersRouter = express.Router();
 

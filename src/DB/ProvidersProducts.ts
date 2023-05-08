@@ -1,6 +1,6 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import IBaseProduct from "audio_diler_common/interfaces/IBaseProduct";
+import IBaseProduct from "dealer_common/interfaces/IBaseProduct";
 import DBMoneyConverter from "../utils/DBMoneyConverter";
 
 class ProvidersProducts {

@@ -1,13 +1,13 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
-import IBaseProvider from "audio_diler_common/interfaces/IBaseProvider";
-import IProvider from "audio_diler_common/interfaces/IProvider";
-import ID from "audio_diler_common/interfaces/ID";
+import IBaseProvider from "dealer_common/interfaces/IBaseProvider";
+import IProvider from "dealer_common/interfaces/IProvider";
+import ID from "dealer_common/interfaces/ID";
 import DB from "./DB";
-import IName from "audio_diler_common/interfaces/IName";
+import IName from "dealer_common/interfaces/IName";
 import BillsProvider from "./BillsProviders";
 import ProvidersProducts from "./ProvidersProducts";
-import ICount from "audio_diler_common/interfaces/ICount";
+import ICount from "dealer_common/interfaces/ICount";
 
 class Providers {
     public static get Bills(): typeof BillsProvider {

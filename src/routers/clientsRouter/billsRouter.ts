@@ -2,10 +2,10 @@ import express, { Response } from "express";
 import RequestBody from "../../interfaces/RequestBody";
 import expressAsyncHandler from "express-async-handler";
 import DB from "../../DB/DB";
-import IBaseBill from "audio_diler_common/interfaces/IBaseBill";
-import IBill from "audio_diler_common/interfaces/IBill";
-import ID from "audio_diler_common/interfaces/ID";
-import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
+import IBaseBill from "dealer_common/interfaces/IBaseBill";
+import IBill from "dealer_common/interfaces/IBill";
+import ID from "dealer_common/interfaces/ID";
+import IBillNumber from "dealer_common/interfaces/IBillNumber";
 
 const billsRouter = express.Router({ 
     mergeParams: true 

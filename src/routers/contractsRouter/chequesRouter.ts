@@ -1,7 +1,7 @@
 import express, { Response } from "express";
 import RequestBody from "../../interfaces/RequestBody";
 import expressAsyncHandler from "express-async-handler";
-import ICheque from "audio_diler_common/interfaces/ICheque";
+import ICheque from "dealer_common/interfaces/ICheque";
 import DB from "../../DB/DB";
 import Logger from "../../logger";
 

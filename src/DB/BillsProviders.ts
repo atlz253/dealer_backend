@@ -1,10 +1,10 @@
 import { QueryConfig } from "pg";
 import pool from "./pool";
 import Bills from "./Bills";
-import ID from "audio_diler_common/interfaces/ID";
-import IBill from "audio_diler_common/interfaces/IBill";
-import IBaseBill from "audio_diler_common/interfaces/IBaseBill";
-import IBillNumber from "audio_diler_common/interfaces/IBillNumber";
+import ID from "dealer_common/interfaces/ID";
+import IBill from "dealer_common/interfaces/IBill";
+import IBaseBill from "dealer_common/interfaces/IBaseBill";
+import IBillNumber from "dealer_common/interfaces/IBillNumber";
 
 // TODO: Удаление и вставку счетов можно переписать в 1 SQL запрос
 class BillsProvider extends Bills {
