@@ -17,8 +17,8 @@ contractsRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Respo
         contract.id,
         contract.sellerName,
         contract.buyerName,
-        contract.type,
-        contract.status,
+        contract.type === "sell" ? "Продажа" : "Покупка",
+        contract.status === "open" ? "Открыт" : "Закрыт",
         contract.price,
         contract.created
     ]));

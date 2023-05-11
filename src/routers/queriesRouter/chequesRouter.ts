@@ -15,7 +15,12 @@ chequesRouter.get("/", expressAsyncHandler(async (req: RequestBody, res: Respons
         ["Номер", "Тип", "Статус оплаты", "Дата доставки"]
     ];
 
-    cheques.forEach(cheque => rows.push([cheque.id, cheque.type, cheque.status, cheque.deliveryDate]));
+    cheques.forEach(cheque => rows.push([
+        cheque.id,
+        cheque.type === "sell" ? "Продажа" : "Покупка",
+        cheque.status === "paid" ? "Оплачен" : "Не оплачен",
+        cheque.deliveryDate
+    ]));
 
     const buffer = createBufferDocument(rows)
 
