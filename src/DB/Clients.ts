@@ -96,6 +96,71 @@ class Clients {
         return result.rows;
     }
 
+    public static async SelectRequestedCategories(): Promise<{clientName: string, categoryName: string}[]> {
+        const query: QueryConfig = {
+            text: `
+                SELECT DISTINCT
+                    first_names.first_name AS "clientName",
+                    categories.name AS "categoryName"
+                FROM
+                    bills,
+                    clients,
+                    cheques,
+                    products,
+                    contracts,
+                    categories,
+                    first_names,
+                    bills_clients,
+                    cheques_products
+                WHERE
+                    bills.bill_id = contracts.buyer_bill_id AND
+                    bills.bill_id = bills_clients.bills_bill_id AND
+                    clients.client_id = bills_clients.clients_client_id AND
+                    first_names.first_name_id = clients.first_name_id AND
+                    cheques.contract_id = contracts.contract_id AND
+                    cheques.cheque_id = cheques_products.cheques_cheque_id AND
+                    products.product_id = cheques_products.products_product_id AND
+                    products.category_id = categories.category_id
+            `
+        };
+    
+        const result = await pool.query<{clientName: string, categoryName: string}>(query);
+    
+        return result.rows;
+    }
+
+    public static async SelectPotentialClientsByProducts(): Promise<{clientName: string, productName: string}[]> {
+        const query: QueryConfig = {
+            text: `
+                SELECT
+                    first_names.first_name AS "clientName",
+                    products.name AS "productName"
+                FROM
+                    bills,
+                    cheques,
+                    clients,
+                    products,
+                    contracts,
+                    first_names,
+                    bills_clients,
+                    cheques_products
+                WHERE
+                    cheques.status = 'unpaid' AND
+                    bills.bill_id = contracts.buyer_bill_id AND
+                    bills.bill_id = bills_clients.bills_bill_id AND
+                    clients.client_id = bills_clients.clients_client_id AND
+                    clients.first_name_id = first_names.first_name_id AND
+                    cheques.contract_id = contracts.contract_id AND
+                    cheques.cheque_id = cheques_products.cheques_cheque_id AND
+                    products.product_id = cheques_products.products_product_id
+            `
+        };
+    
+        const result = await pool.query<{clientName: string, productName: string}>(query);
+    
+        return result.rows;
+    }
+
     public static async Insert(client: IClient): Promise<ID> {
         const nameID = await DB.FirstNames.SelectIDByName(client.name);
         

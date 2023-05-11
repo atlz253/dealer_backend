@@ -7,6 +7,12 @@ import IBaseProduct from "dealer_common/interfaces/IBaseProduct";
 import DBMoneyConverter from "../utils/DBMoneyConverter";
 import format from "pg-format";
 import ICount from "dealer_common/interfaces/ICount";
+import Logger from "../logger";
+
+interface IProductsSelectAllParams {
+    onlyAvaibleInStock: boolean,
+    avaibleForOrder: boolean
+}
 
 class Products {
     public static async Insert(product: IProduct): Promise<ID> {
@@ -38,28 +44,56 @@ class Products {
         return result.rows[0];
     }
 
-    public static async SelectAll(): Promise<IBaseProduct[]> {
-        const query: QueryConfig = {
-            text: `
-                SELECT 
-                    products.product_id as id, 
+    public static async SelectAll(params?: Partial<IProductsSelectAllParams>): Promise<IBaseProduct[]> {
+        const queryParams = params ?
+            format(
+                `
+                    %s
+                    %s
+                `,
+                params.onlyAvaibleInStock ? "AND products.quantity > 0" : "",
+                params.avaibleForOrder ? "AND providers_products.products_product_id = products.product_id" : ""
+            )
+            :
+            "";
+
+        const additionalTables = params ?
+            format(
+                `
+                        %s
+                    `,
+                params.avaibleForOrder ? ", providers_products" : ""
+            )
+            :
+            "";
+
+        Logger.debug(queryParams)
+
+        const query = format(
+            `
+                SELECT DISTINCT ON (products.product_id)
+                    products.product_id AS id, 
                     products.name, 
-                    categories.name as category, 
+                    categories.name AS category, 
                     products.price, 
                     products.quantity
                 FROM 
                     products, 
                     categories
+                    %s
                 WHERE 
-                    products.category_id = categories.category_id 
-            `
-        }
+                    products.category_id = categories.category_id
+                    %s 
+            `,
+            additionalTables,
+            queryParams
+        )
 
         const result = await pool.query<IBaseProduct>(query);
 
         for (let i = 0; i < result.rowCount; i++) {
             const row = result.rows[i];
-            
+
             row.price = DBMoneyConverter.ConvertMoneyToNumber(row.price);
         }
 
@@ -95,7 +129,7 @@ class Products {
 
         for (let i = 0; i < result.rowCount; i++) {
             const row = result.rows[i];
-            
+
             row.price = DBMoneyConverter.ConvertMoneyToNumber(row.price);
         }
 
@@ -111,9 +145,9 @@ class Products {
                     products
             `
         };
-    
+
         const result = await pool.query<ICount>(query);
-    
+
         return result.rows[0];
     }
 
@@ -137,12 +171,12 @@ class Products {
                     product_id = $7
             `,
             values: [
-                product.name, 
-                price, 
-                product.quantity, 
-                product.description, 
-                categoryID, 
-                manufacturerID, 
+                product.name,
+                price,
+                product.quantity,
+                product.description,
+                categoryID,
+                manufacturerID,
                 product.id
             ]
         }
@@ -168,7 +202,7 @@ class Products {
             operation,
             chequeID
         );
-    
+
         await pool.query(query);
     }
 

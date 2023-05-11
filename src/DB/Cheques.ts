@@ -6,12 +6,29 @@ import ChequesProducts from "./ChequesProducts";
 import format from "pg-format";
 import Logger from "../logger";
 
+interface IChequeSelectParams {
+    contractID: number,
+    chequeStatus: string
+}
+
 class Cheques {
     public static get Products(): typeof ChequesProducts {
         return ChequesProducts;
     }
 
-    public static async SelectByContractID(contractID: number, chequeStatus?: string): Promise<ICheque[]> {
+    public static async Select(params?: Partial<IChequeSelectParams>): Promise<ICheque[]> {
+        const queryParams = params ?
+            format(
+                `
+                    %s
+                    %s
+                `,
+                params.contractID ? format("AND cheques.contract_id = %s", params.contractID) : "",
+                params.chequeStatus ? format("AND cheques.status = %L", params.chequeStatus) : ""
+            )
+            :
+            "";
+        
         const query = format(
             `
                 SELECT
@@ -23,12 +40,10 @@ class Cheques {
                     cheques,
                     contracts
                 WHERE
-                    cheques.contract_id = %s AND
                     cheques.contract_id = contracts.contract_id
                     %s
             `,
-            contractID,
-            chequeStatus ? format("AND cheques.status = %L", chequeStatus) : ""
+            queryParams
         ); 
 
         const result = await pool.query<ICheque>(query);

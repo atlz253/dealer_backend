@@ -14,6 +14,7 @@ import billsRouter from "./routers/billsRouter";
 import clientsRouter from "./routers/clientsRouter/clientsRouter";
 import IUser from "dealer_common/interfaces/IUser";
 import providersRouter from "./routers/providersRouter/providersRouter";
+import queriesRouter from "./routers/queriesRouter/queriesRouter";
 
 const app: Express = express();
 
@@ -28,6 +29,7 @@ app.use("/login", loginRouter);
 app.use("/users", usersRouter);
 app.use("/bills", billsRouter);
 app.use("/providers", providersRouter);
+app.use("/queries", queriesRouter);
 
 app.use(errorHandler);
 

@@ -16,7 +16,7 @@ chequesRouter.put("/:chequeID", expressAsyncHandler(async (req: RequestBody<IChe
 
     DB.Products.UpdateQuantityByChequeID(req.body.id, req.body.type === "buy" ? "+" : "-");
 
-    DB.Cheques.SelectByContractID(contractID, "unpaid").then(cheques => {
+    DB.Cheques.Select({contractID, chequeStatus: "unpaid"}).then(cheques => {
         if (cheques.length === 0) {
             DB.Contracts.UpdateStatus(contractID, "close");
         }

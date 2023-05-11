@@ -4,7 +4,7 @@ class DBMoneyConverter {
             return 0;
         }
 
-        return Number(money.toString().replace(" ?", "").replace(",", "."));
+        return Number(money.toString().replace(" ?", "").replace(",", ".").replace(/\s/g, ""));
     }
 
     public static ConvertNumberToMoney(number: number): string {
